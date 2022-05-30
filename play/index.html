@@ -5,15 +5,30 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="js/pixi.min.js"></script>
+    
+    <style>
+        @font-face {
+            font-family: 'Pixelated';
+            src: url('font/arcade-classic.ttf');
+        }
+        #useFont {
+            font-family: 'Pixelated';
+            font-size: 0px;
+        }
+    </style>
+    
     <script>
     let app;
     let player;
+    let playerSheet = {};
+    let playerSpeed = 5;
     let enemy;
     let mouse = {"x": 0, "y": 0};
     let angle; // angle from player to mouse
     let bullets = [];
     let bulletSpeed = 15;
-
+    let loopCount = 0;
+    let text;
     let keys = {};
     let keysDiv;
 
@@ -35,32 +50,35 @@
 
         document.body.appendChild(app.view);
 
+        text = new PIXI.Text('Welcome   to   the   void!');
+        text.x = app.view.width / 2;
+        text.y = app.view.height / 2;
+        text.anchor.set(0.5);
+        text.style = new PIXI.TextStyle(
+                {
+                fontFamily: 'Pixelated',
+                fontSize: '32px',
+                fill: '#ffffff',
+                align: 'center',
+            }
+        );
+        app.stage.addChild(text);
+
         // preload assets
         // app.loader.baseURL = 'images'; // wasnt working would be nice to remove images in all of those below
 
         app.loader
             .add("player", "images/player3.png")
-            .add("bullet", "images/bullet.png");
-
+            .add("enemy", "images/enemy3.png")
+            .add("bullet", "images/bullet.png")
+            .add("spaceman", "images/spaceman.png");
+        
         // add this to game thread status dict
         app.loader.onProgress.add(showProgress);
         app.loader.onComplete.add(doneLoading); // if loaded, add assets to stage
         app.loader.onError.add(reportError);
 
         app.loader.load();
-
-        // mouse interaction
-        // app.stage.interactive = true;
-        // app.stage.on("pointermove", movePlayer);
-
-        //keyboard event handlers
-        window.addEventListener("mousemove", mouseMove);
-        window.addEventListener("keydown", keyDown);
-        window.addEventListener("keyup", keyUp);
-        window.addEventListener("pointerdown", pointerDown);
-
-        // game loop
-        app.ticker.add(gameLoop);
 
         // keysDiv = document.querySelector("#keys");
     }
@@ -73,6 +91,15 @@
         let pos = e.data.global;
         player.x = pos.x;
         player.y = pos.y;
+    }
+
+    function collision(a,b){
+        let abox = a.getBounds();
+        let bbox = b.getBounds();
+        return  abox.x + abox.width > bbox.x && 
+                abox.x < bbox.x + bbox.width && 
+                abox.y + abox.height > bbox.y && 
+                abox.y < bbox.y + bbox.height;
     }
 
     function mouseMove(e) {
@@ -116,7 +143,7 @@
      }
 
      function updateBullets() {
-         speed = 15;
+        let speed = 15;
         for (let i = 0; i < bullets.length; i++) {
             let bullet = bullets[i];
             bullet.x = bullet.x + Math.cos(angle * Math.PI / 180) * speed;
@@ -131,21 +158,53 @@
      function gameLoop(delta) {
         //  keysDiv.innerHTML = JSON.stringify(keys);
         updateBullets(delta);
-        // D
+        
+        // A
         if (keys[65]) {
-            player.x -= 7;
+            if(!player.playing){
+                player.textures = playerSheet.walkEast;
+                player.play()
+                console.log("player is walking west");
+            }
+            player.x -= playerSpeed;
         }
         // S
         if (keys[87]) {
-            player.y -= 7;
+            // player.textures = playerSheet.duck;
+            player.y -= playerSpeed;
         }
         // A
         if (keys[68]) {
-            player.x += 7;
+            if(!player.playing){
+                player.textures = playerSheet.walkEast;
+                player.play()
+                console.log("player is walking east");
+            }
+            player.x += playerSpeed;
         }
         // W
         if (keys[83]) {
-            player.y += 7;
+            // player.textures = playerSheet.jump;
+            player.y += playerSpeed;
+        }
+
+        try {
+            if (collision(enemy, player)) {
+                console.log("collision");
+                playerSpeed = 1;
+            } else {
+                playerSpeed = 5;
+            }
+        } catch (e) {
+            console.log("objects not yet created");
+        }
+
+        loopCount++;
+        if (loopCount % 60 == 0) {
+            console.log("fps: ", app.ticker.FPS);
+        }
+        if (loopCount % 120 == 0) {
+            app.stage.removeChild(text);
         }
      }
 
@@ -158,12 +217,61 @@
         console.log("done loading!");
 
         // player object
-        player = new PIXI.Sprite.from(app.loader.resources.player.texture);
-        player.anchor.set(0.5);
-        player.x = app.view.width / 2;
-        player.y = app.view.height / 2;
+        createPlayerSheet();
+        createPlayer();
+        // player = new PIXI.Sprite.from(app.loader.resources.player.texture);
+        // player.anchor.set(0.5);
+        // player.x = app.view.width / 2 - 275;
+        // player.y = app.view.height / 2 + 275;
+        // app.stage.addChild(player);
 
+        // enemy object
+        enemy = new PIXI.Sprite.from(app.loader.resources.enemy.texture);
+        enemy.anchor.set(0.5);
+        enemy.x = app.view.width / 2 + 275;
+        enemy.y = app.view.height / 2 + 275;
+        app.stage.addChild(enemy);
+
+        // mouse interaction
+        // app.stage.interactive = true;
+        // app.stage.on("pointermove", movePlayer);
+
+        //keyboard event handlers
+        window.addEventListener("mousemove", mouseMove);
+        window.addEventListener("keydown", keyDown);
+        window.addEventListener("keyup", keyUp);
+        window.addEventListener("pointerdown", pointerDown);
+
+        // game loop
+        app.ticker.add(gameLoop);
+     }
+
+     function createPlayerSheet() {
+        let sheet = new PIXI.BaseTexture.from(app.loader.resources["spaceman"].url);
+        let w = 122;
+        let h = 165;
+
+        playerSheet["standEast"] = [ 
+            new PIXI.Texture(sheet, new PIXI.Rectangle(0, 0, w, h)),
+        ]
+        playerSheet["walkEast"] = [
+            new PIXI.Texture(sheet, new PIXI.Rectangle(0, 0, w, h)),
+            new PIXI.Texture(sheet, new PIXI.Rectangle(w, 0, w, h)),
+            new PIXI.Texture(sheet, new PIXI.Rectangle(0, h, w, h))
+        ]
+        
+        // playerSheet["walking"]
+     }
+
+     function createPlayer() {
+        player = new PIXI.AnimatedSprite(playerSheet.standEast);
+        player.anchor.set(0.5);
+        player.animationSpeed = 0.1;
+        player.loop = false;
+        player.x = app.view.width / 2 - 275;
+        player.y = app.view.height / 2 + 275;
         app.stage.addChild(player);
+        player.play();
      }
 
      function reportError(loader, resource) {
@@ -174,5 +282,6 @@
 </head>
 <body>
     <!-- <div id="keys"></div> -->
+    <div id="useFont">_</div>
 </body>
 </html>
