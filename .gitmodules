@@ -1,0 +1,9 @@
+[submodule "submodules/aiortc"]
+	path = submodules/aiortc
+	url = https://github.com/aiortc/aiortc.git
+[submodule "submodules/python-socketio"]
+	path = submodules/python-socketio
+	url = https://github.com/miguelgrinberg/python-socketio.git
+[submodule "submodules/examples"]
+	path = submodules/examples
+	url = https://github.com/pixijs/examples.git
