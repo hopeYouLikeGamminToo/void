@@ -7,3 +7,6 @@
 [submodule "submodules/examples"]
 	path = submodules/examples
 	url = https://github.com/pixijs/examples.git
+[submodule "submodules/AsepriteScripts"]
+	path = submodules/AsepriteScripts
+	url = https://github.com/PKGaspi/AsepriteScripts.git

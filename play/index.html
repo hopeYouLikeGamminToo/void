@@ -19,6 +19,13 @@
     
     <script>
     let app;
+    let backdrop;
+    let mountainFar;
+    let mountainClose;
+    let treesFar;
+    let treesClose;
+    let bgX = 0;
+    let bgSpeed = 1;
     let player;
     let playerSheet = {};
     let playerSpeed = 5;
@@ -39,8 +46,8 @@
             {
                 autoResize: true,
                 // resolution: devicePixelRatio,
-                width: window.outerWidth,
-                height: window.outerHeight,
+                width: window.outerWidth, // 800
+                height: window.outerHeight, // 600
                 backgroundColor: 0xaaaaaa,
             }
         );
@@ -50,34 +57,24 @@
 
         document.body.appendChild(app.view);
 
-        text = new PIXI.Text('Welcome   to   the   void!');
-        text.x = app.view.width / 2;
-        text.y = app.view.height / 2;
-        text.anchor.set(0.5);
-        text.style = new PIXI.TextStyle(
-                {
-                fontFamily: 'Pixelated',
-                fontSize: '32px',
-                fill: '#ffffff',
-                align: 'center',
-            }
-        );
-        app.stage.addChild(text);
-
         // preload assets
-        // app.loader.baseURL = 'images'; // wasnt working would be nice to remove images in all of those below
+        // app.loader.baseURL = 'assets'; // wasnt working would be nice to remove images in all of those below
 
         app.loader
-            .add("player", "images/player3.png")
-            .add("enemy", "images/enemy3.png")
-            .add("bullet", "images/bullet.png")
-            .add("spaceman", "images/spaceman.png");
+            .add('backdrop', 'assets/mountain-dusk-parallax/backdrop.png')
+            .add('mountainFar', 'assets/mountain-dusk-parallax/mountains-far.png')
+            .add('mountainClose', 'assets/mountain-dusk-parallax/mountains-close.png')
+            .add('treesFar', 'assets/mountain-dusk-parallax/trees-far.png')
+            .add('treesClose', 'assets/mountain-dusk-parallax/trees-close.png')
+            .add("player", "assets/spaceman/original.png")
+            .add("enemy", "assets/spaceman/plant-based.png")
+            .add("bullet", "assets/bullet.png")
+            .add("spaceman", "assets/spaceman/spaceman.png");
         
         // add this to game thread status dict
         app.loader.onProgress.add(showProgress);
         app.loader.onComplete.add(doneLoading); // if loaded, add assets to stage
         app.loader.onError.add(reportError);
-
         app.loader.load();
 
         // keysDiv = document.querySelector("#keys");
@@ -157,6 +154,7 @@
 
      function gameLoop(delta) {
         //  keysDiv.innerHTML = JSON.stringify(keys);
+        updateBackground();
         updateBullets(delta);
         
         // A
@@ -216,6 +214,13 @@
      function doneLoading(loader, resources) {
         console.log("done loading!");
 
+        // create background
+        backdrop = createBackground(app.loader.resources["backdrop"].texture);
+        mountainsFar = createBackground(app.loader.resources["mountainFar"].texture);
+        mountainsClose = createBackground(app.loader.resources["mountainClose"].texture);
+        treesFar = createBackground(app.loader.resources["treesFar"].texture);
+        treesClose = createBackground(app.loader.resources["treesClose"].texture);
+
         // player object
         createPlayerSheet();
         createPlayer();
@@ -229,7 +234,7 @@
         enemy = new PIXI.Sprite.from(app.loader.resources.enemy.texture);
         enemy.anchor.set(0.5);
         enemy.x = app.view.width / 2 + 275;
-        enemy.y = app.view.height / 2 + 275;
+        enemy.y = app.view.height - 100;
         app.stage.addChild(enemy);
 
         // mouse interaction
@@ -242,8 +247,30 @@
         window.addEventListener("keyup", keyUp);
         window.addEventListener("pointerdown", pointerDown);
 
+        text = new PIXI.Text('Welcome   to   the   void!');
+        text.x = app.view.width / 2;
+        text.y = app.view.height / 2;
+        text.anchor.set(0.5);
+        text.style = new PIXI.TextStyle(
+                {
+                fontFamily: 'Pixelated',
+                fontSize: '32px',
+                fill: '#ffffff',
+                align: 'center',
+            }
+        );
+        app.stage.addChild(text);
+
         // game loop
         app.ticker.add(gameLoop);
+     }
+
+     function createBackground(texture) {
+        let tiling = new PIXI.TilingSprite(texture, app.view.width, app.view.height);
+        tiling.position.set(0,0);
+        app.stage.addChild(tiling);
+
+        return tiling;
      }
 
      function createPlayerSheet() {
@@ -269,13 +296,22 @@
         player.animationSpeed = 0.1;
         player.loop = false;
         player.x = app.view.width / 2 - 275;
-        player.y = app.view.height / 2 + 275;
+        player.y = app.view.height - 80; // / 2 + 275;
         app.stage.addChild(player);
         player.play();
      }
 
      function reportError(loader, resource) {
         console.log("error loading: " + resource.url);
+     }
+
+     function updateBackground() {
+        bgX = (bgX + bgSpeed);
+        treesClose.tilePosition.x = bgX/ 6;
+        treesFar.tilePosition.x = bgX / 8;
+        mountainsClose.tilePosition.x = bgX / 10;
+        mountainsFar.tilePosition.x = bgX /12;
+        backdrop.tilePosition.x = bgX / 14; 
      }
 
     </script>
