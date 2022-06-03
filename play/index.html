@@ -69,7 +69,12 @@
             .add("player", "assets/spaceman/original.png")
             .add("enemy", "assets/spaceman/plant-based.png")
             .add("bullet", "assets/bullet.png")
-            .add("spaceman", "assets/spaceman/spaceman.png");
+            .add("spaceman", "assets/spaceman/spaceman.png")
+            .add("spacemanHead", "assets/spaceman/disassembled/head.png")
+            .add("spacemanTorso", "assets/spaceman/disassembled/torso.png")
+            .add("spacemanLegs", "assets/spaceman/disassembled/legs.png")
+            .add("spacemanArms", "assets/spaceman/disassembled/arms.png")
+            .add("spacemanWeapon", "assets/spaceman/disassembled/weapon.png");
         
         // add this to game thread status dict
         app.loader.onProgress.add(showProgress);
@@ -83,6 +88,109 @@
     function resize() {
         app.renderer.resize(window.innerWidth, window.innerHeight);
     }
+
+    function showProgress(loader, resource) {
+        // console.log("loading: " + resource.url);
+        console.log("progress: " + loader.progress + "%");
+     }
+
+     function doneLoading(loader, resources) {
+        console.log("done loading!");
+
+        // create background
+        backdrop = createBackground(app.loader.resources["backdrop"].texture);
+        mountainsFar = createBackground(app.loader.resources["mountainFar"].texture);
+        mountainsClose = createBackground(app.loader.resources["mountainClose"].texture);
+        treesFar = createBackground(app.loader.resources["treesFar"].texture);
+        treesClose = createBackground(app.loader.resources["treesClose"].texture);
+
+        // player object
+        createPlayerSheet();
+        createPlayer();
+        // player = new PIXI.Sprite.from(app.loader.resources.player.texture);
+        // player.anchor.set(0.5);
+        // player.x = app.view.width / 2 - 275;
+        // player.y = app.view.height / 2 + 275;
+        // app.stage.addChild(player);
+
+        // enemy object
+        enemy = new PIXI.Sprite.from(app.loader.resources.enemy.texture);
+        enemy.anchor.set(0.5);
+        enemy.x = app.view.width / 2 + 275;
+        enemy.y = app.view.height - 100;
+        app.stage.addChild(enemy);
+
+        // mouse interaction
+        // app.stage.interactive = true;
+        // app.stage.on("pointermove", movePlayer);
+
+        //keyboard event handlers
+        window.addEventListener("mousemove", mouseMove);
+        window.addEventListener("keydown", keyDown);
+        window.addEventListener("keyup", keyUp);
+        window.addEventListener("pointerdown", pointerDown);
+
+        text = new PIXI.Text('Welcome   to   the   void!');
+        text.x = app.view.width / 2;
+        text.y = app.view.height / 2;
+        text.anchor.set(0.5);
+        text.style = new PIXI.TextStyle(
+                {
+                fontFamily: 'Pixelated',
+                fontSize: '32px',
+                fill: '#ffffff',
+                align: 'center',
+            }
+        );
+        app.stage.addChild(text);
+
+        // game loop
+        app.ticker.add(gameLoop);
+     }
+
+     function reportError(loader, resource) {
+        console.log("error loading: " + resource.url);
+     }
+
+     function createBackground(texture) {
+        let tiling = new PIXI.TilingSprite(texture, app.view.width, app.view.height);
+        tiling.position.set(0,0);
+        app.stage.addChild(tiling);
+
+        return tiling;
+     }
+     function createPlayerSheet() {
+        let w = 122; // fixed
+        let h = 165;
+
+        // assembled
+        let sheet = new PIXI.BaseTexture.from(app.loader.resources["spaceman"].url);
+
+        playerSheet["standEast"] = [
+            // assembled
+            new PIXI.Texture(sheet, new PIXI.Rectangle(0, 0, w, h)),
+
+        ]
+        playerSheet["walkEast"] = [
+            // assembled
+            new PIXI.Texture(sheet, new PIXI.Rectangle(0, 0, w, h)),
+            new PIXI.Texture(sheet, new PIXI.Rectangle(w, 0, w, h)),
+            new PIXI.Texture(sheet, new PIXI.Rectangle(0, h, w, h))
+        ]
+        
+        // playerSheet["walking"]
+     }
+
+     function createPlayer() {
+        player = new PIXI.AnimatedSprite(playerSheet.standEast);
+        player.anchor.set(0.5);
+        player.animationSpeed = 0.1;
+        player.loop = false;
+        player.x = app.view.width / 2 - 275;
+        player.y = app.view.height - 80; // / 2 + 275;
+        app.stage.addChild(player);
+        player.play();
+     }
 
     function movePlayer(e) {
         let pos = e.data.global;
@@ -152,6 +260,15 @@
         }
      }
 
+     function updateBackground() {
+        bgX = (bgX + bgSpeed);
+        treesClose.tilePosition.x = bgX/ 6;
+        treesFar.tilePosition.x = bgX / 8;
+        mountainsClose.tilePosition.x = bgX / 10;
+        mountainsFar.tilePosition.x = bgX /12;
+        backdrop.tilePosition.x = bgX / 14; 
+     }
+
      function gameLoop(delta) {
         //  keysDiv.innerHTML = JSON.stringify(keys);
         updateBackground();
@@ -204,114 +321,6 @@
         if (loopCount % 120 == 0) {
             app.stage.removeChild(text);
         }
-     }
-
-     function showProgress(loader, resource) {
-        // console.log("loading: " + resource.url);
-        console.log("progress: " + loader.progress + "%");
-     }
-
-     function doneLoading(loader, resources) {
-        console.log("done loading!");
-
-        // create background
-        backdrop = createBackground(app.loader.resources["backdrop"].texture);
-        mountainsFar = createBackground(app.loader.resources["mountainFar"].texture);
-        mountainsClose = createBackground(app.loader.resources["mountainClose"].texture);
-        treesFar = createBackground(app.loader.resources["treesFar"].texture);
-        treesClose = createBackground(app.loader.resources["treesClose"].texture);
-
-        // player object
-        createPlayerSheet();
-        createPlayer();
-        // player = new PIXI.Sprite.from(app.loader.resources.player.texture);
-        // player.anchor.set(0.5);
-        // player.x = app.view.width / 2 - 275;
-        // player.y = app.view.height / 2 + 275;
-        // app.stage.addChild(player);
-
-        // enemy object
-        enemy = new PIXI.Sprite.from(app.loader.resources.enemy.texture);
-        enemy.anchor.set(0.5);
-        enemy.x = app.view.width / 2 + 275;
-        enemy.y = app.view.height - 100;
-        app.stage.addChild(enemy);
-
-        // mouse interaction
-        // app.stage.interactive = true;
-        // app.stage.on("pointermove", movePlayer);
-
-        //keyboard event handlers
-        window.addEventListener("mousemove", mouseMove);
-        window.addEventListener("keydown", keyDown);
-        window.addEventListener("keyup", keyUp);
-        window.addEventListener("pointerdown", pointerDown);
-
-        text = new PIXI.Text('Welcome   to   the   void!');
-        text.x = app.view.width / 2;
-        text.y = app.view.height / 2;
-        text.anchor.set(0.5);
-        text.style = new PIXI.TextStyle(
-                {
-                fontFamily: 'Pixelated',
-                fontSize: '32px',
-                fill: '#ffffff',
-                align: 'center',
-            }
-        );
-        app.stage.addChild(text);
-
-        // game loop
-        app.ticker.add(gameLoop);
-     }
-
-     function createBackground(texture) {
-        let tiling = new PIXI.TilingSprite(texture, app.view.width, app.view.height);
-        tiling.position.set(0,0);
-        app.stage.addChild(tiling);
-
-        return tiling;
-     }
-
-     function createPlayerSheet() {
-        let sheet = new PIXI.BaseTexture.from(app.loader.resources["spaceman"].url);
-        let w = 122;
-        let h = 165;
-
-        playerSheet["standEast"] = [ 
-            new PIXI.Texture(sheet, new PIXI.Rectangle(0, 0, w, h)),
-        ]
-        playerSheet["walkEast"] = [
-            new PIXI.Texture(sheet, new PIXI.Rectangle(0, 0, w, h)),
-            new PIXI.Texture(sheet, new PIXI.Rectangle(w, 0, w, h)),
-            new PIXI.Texture(sheet, new PIXI.Rectangle(0, h, w, h))
-        ]
-        
-        // playerSheet["walking"]
-     }
-
-     function createPlayer() {
-        player = new PIXI.AnimatedSprite(playerSheet.standEast);
-        player.anchor.set(0.5);
-        player.animationSpeed = 0.1;
-        player.loop = false;
-        player.x = app.view.width / 2 - 275;
-        player.y = app.view.height - 80; // / 2 + 275;
-        app.stage.addChild(player);
-        player.play();
-     }
-
-     function reportError(loader, resource) {
-        console.log("error loading: " + resource.url);
-     }
-
-     function updateBackground() {
-        bgX = (bgX + bgSpeed);
-        treesClose.tilePosition.x = bgX/ 6;
-        treesFar.tilePosition.x = bgX / 8;
-        mountainsClose.tilePosition.x = bgX / 10;
-        mountainsFar.tilePosition.x = bgX /12;
-        backdrop.tilePosition.x = bgX / 14; 
      }
 
     </script>
