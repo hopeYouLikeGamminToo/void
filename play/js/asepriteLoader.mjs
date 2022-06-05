@@ -1,0 +1,187 @@
+"use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+
+
+import * as PIXI from "./pixi.mjs"
+
+// Use the native window resolution as the default resolution
+// will support high-density displays when rendering
+PIXI.settings.RESOLUTION = window.devicePixelRatio;
+// Disable interpolation when scaling, will make texture be pixelated
+PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST;
+
+var app = new PIXI.Application({
+    // options
+    autoResize: true,
+    resizeTo: window,
+    resolution: devicePixelRatio,
+    width: window.outerWidth,
+    height: window.outerHeight,
+    backgroundColor: 0x000000,
+    autoDensity: true
+});
+
+document.body.appendChild(app.view);
+
+var MultiAnimatedSprite = /** @class */ (function (_super) {
+    __extends(MultiAnimatedSprite, _super);
+    function MultiAnimatedSprite(spritesheet) {
+        var _this = _super.call(this) || this;
+        _this.spritesheet = spritesheet;
+        _this.scale.x = _this.scale.y = 1;
+        var defaultAnimation = Object.keys(spritesheet.animations)[0];
+        _this.setAnimation(defaultAnimation);
+        return _this;
+    }
+    MultiAnimatedSprite.prototype.setAnimation = function (name) {
+        if (this.currentAnimation === name)
+            return;
+        
+            var textures = this.spritesheet.animations[name];
+            if (!this.sprite) {
+                this.sprite = new PIXI.AnimatedSprite(textures);
+                this.addChild(this.sprite);
+            }
+            else {
+                this.sprite.textures = textures;
+            }
+            this.sprite.animationSpeed = 0.36;
+            this.sprite.play();
+            this.currentAnimation = name;
+    };
+    return MultiAnimatedSprite;
+}(PIXI.Container));
+
+var state = {
+    keys: {},
+    player: null,
+};
+
+var mouse = {
+    "x": 0,
+    "y": 0,
+    "angle": 0
+}
+
+var playerSpeed = 5;
+var bullets = [];
+
+function tick() {
+    updateBullets();
+    
+    if (state.keys['Space']) {
+        state.player.setAnimation('Jump');
+    } else if (state.keys['click']) {
+        state.player.setAnimation('Shoot');
+    } else if (state.keys["KeyA"]) {
+        console.log("player is walking west");
+        state.player.x -= playerSpeed;
+    } else if (state.keys["KeyW"]) {
+        state.player.y -= playerSpeed;
+        console.log("player is walking north");
+    } else if (state.keys["KeyD"]) {
+        state.player.x += playerSpeed;
+        console.log("player is walking east");
+    } else if (state.keys["KeyS"]) {
+        state.player.y += playerSpeed;
+        console.log("player is walking south");
+    }
+    else {
+        state.player.setAnimation('Idle');
+    }
+}
+
+function updateBullets() {
+    let speed = 15;
+    for (let i = 0; i < bullets.length; i++) {
+        let bullet = bullets[i];
+        bullet.x = bullet.x + Math.cos(mouse.angle * Math.PI / 180) * speed;
+        bullet.y = bullet.y + Math.sin(mouse.angle * Math.PI / 180) * speed;
+        if (bullet.y < 0) {
+            app.stage.removeChild(bullet);
+            bullets.splice(i, 1);
+        }
+    }
+}
+
+// preload assets
+app.loader.baseUrl = 'assets';
+app.loader
+    .use(function (resource, next) {
+    if (resource.extension === 'json' && resource.data.meta.app === 'http://www.aseprite.org/') {
+        for (var _i = 0, _a = resource.data.meta.frameTags; _i < _a.length; _i++) {
+            var tag = _a[_i];
+            var frames = [];
+            for (var i = tag.from; i < tag.to; i++) {
+                frames.push({ texture: resource.textures[i], time: resource.data.frames[i].duration });
+            }
+            if (tag.direction === 'pingpong') {
+                for (var i = tag.to; i >= tag.from; i--) {
+                    frames.push({ texture: resource.textures[i], time: resource.data.frames[i].duration });
+                }
+            }
+            resource.spritesheet.animations[tag.name] = frames;
+        }
+    }
+    next();
+})
+    .add('player', 'spaceman/spaceman.json')
+    .add("bullet", "bullet.png").load(setup);
+
+function setup(loader, resources) {
+    var player = state.player = new MultiAnimatedSprite(resources.player.spritesheet);
+    player.x = app.renderer.width / 2;
+    player.y = app.renderer.height / 2;
+    app.stage.addChild(player);
+    app.ticker.add(tick);
+}
+
+document.body.onkeydown = function (e) {
+    console.log("onkeydown: ", e.code);
+    state.keys[e.code] = true;
+};
+document.body.onkeyup = function (e) {
+    console.log("onkeykeyup: ", e.code);
+    delete state.keys[e.code];
+};
+document.body.onmousedown = function (e) {
+    console.log("onclick: ", e);
+
+    mouse.x = e.x;
+    mouse.y = e.y;
+    mouse.angle
+
+    state.keys["click"] = true;
+
+    console.log("player {" + state.player.x + "," + state.player.y + "} " + "fires at {" + mouse.x + "," + mouse.y + "}");
+};
+document.body.onmouseup = function (e) {
+    // console.log("onmouseup: ", e);
+
+    let bullet = new PIXI.Sprite(app.loader.resources.bullet.texture);
+    bullet.x = state.player.x + 145; // change to gun.x || arm.x
+    bullet.y = state.player.y + 115;
+    app.stage.addChild(bullet);
+    bullets.push(bullet);
+
+    delete state.keys["click"];
+};
+document.body.onmousemove = function (e) {
+    mouse.x = e.x;
+    mouse.y = e.y;
+    mouse.angle = Math.atan2(mouse.y - state.player.y - 145, mouse.x - state.player.x + 115) * 180 / Math.PI;
+};
