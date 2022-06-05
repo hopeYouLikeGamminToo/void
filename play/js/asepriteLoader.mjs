@@ -88,15 +88,19 @@ function tick() {
     } else if (state.keys['click']) {
         state.player.setAnimation('Shoot');
     } else if (state.keys["KeyA"]) {
+        state.player.setAnimation('Walk');
         console.log("player is walking west");
         state.player.x -= playerSpeed;
     } else if (state.keys["KeyW"]) {
+        state.player.setAnimation('Walk');
         state.player.y -= playerSpeed;
         console.log("player is walking north");
     } else if (state.keys["KeyD"]) {
+        state.player.setAnimation('Walk');
         state.player.x += playerSpeed;
         console.log("player is walking east");
     } else if (state.keys["KeyS"]) {
+        state.player.setAnimation('Walk');
         state.player.y += playerSpeed;
         console.log("player is walking south");
     }
@@ -144,8 +148,8 @@ app.loader
 
 function setup(loader, resources) {
     var player = state.player = new MultiAnimatedSprite(resources.player.spritesheet);
-    player.x = app.renderer.width / 2;
-    player.y = app.renderer.height / 2;
+    player.x = app.view.width / 4;
+    player.y = app.view.height / 4;
     app.stage.addChild(player);
     app.ticker.add(tick);
 }

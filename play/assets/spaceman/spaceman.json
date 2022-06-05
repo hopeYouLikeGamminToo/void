@@ -126,24 +126,34 @@
     "spriteSourceSize": { "x": 0, "y": 0, "w": 190, "h": 199 },
     "sourceSize": { "w": 190, "h": 199 },
     "duration": 100
+   },
+   "16": {
+    "frame": { "x": 3040, "y": 0, "w": 190, "h": 199 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 190, "h": 199 },
+    "sourceSize": { "w": 190, "h": 199 },
+    "duration": 100
    }
  },
  "animations": {
-  "Idle": ["0"],
-  "Jump": ["1", "2", "3", "4", "5", "6", "7", "8"],
-  "Shoot": ["9", "10", "11", "12", "13", "14", "15"]
+	"Idle": ["0"],
+	"Jump": ["1","2","3","4","5","6"],
+	"Shoot": ["7","8","9","10","11","12","13"],
+	"Walk": ["14","15","16"]
 },
  "meta": {
   "app": "https://www.aseprite.org/",
   "version": "1.2.34.1-x64",
   "image": "spaceman.png",
   "format": "I8",
-  "size": { "w": 3040, "h": 199 },
+  "size": { "w": 3230, "h": 199 },
   "scale": "1",
   "frameTags": [
-   { "name": "idle", "from": 0, "to": 0, "direction": "forward" },
-   { "name": "jump", "from": 1, "to": 7, "direction": "forward" },
-   { "name": "shoot", "from": 8, "to": 15, "direction": "forward" }
+   { "name": "Idle", "from": 0, "to": 0, "direction": "forward" },
+   { "name": "Jump", "from": 1, "to": 6, "direction": "forward" },
+   { "name": "Shoot", "from": 7, "to": 13, "direction": "forward" },
+   { "name": "Walk", "from": 14, "to": 16, "direction": "forward" }
   ],
   "layers": [
    { "name": "Spaceman", "opacity": 255, "blendMode": "normal" }
