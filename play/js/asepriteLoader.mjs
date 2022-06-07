@@ -59,7 +59,7 @@ var MultiAnimatedSprite = /** @class */ (function (_super) {
             else {
                 this.sprite.textures = textures;
             }
-            this.sprite.animationSpeed = 0.36;
+            this.sprite.animationSpeed = 0.25;
             this.sprite.play();
             this.currentAnimation = name;
     };
@@ -106,6 +106,7 @@ function tick() {
     }
     else {
         state.player.setAnimation('Idle');
+        // state.moon.setAnimation('Idle');
     }
 }
 
@@ -144,13 +145,21 @@ app.loader
     next();
 })
     .add('player', 'spaceman/spaceman.json')
-    .add("bullet", "bullet.png").load(setup);
+    .add("bullet", "bullet.png")
+    .add("moon", "moon.json").load(setup);
 
 function setup(loader, resources) {
     var player = state.player = new MultiAnimatedSprite(resources.player.spritesheet);
     player.x = app.view.width / 4;
     player.y = app.view.height / 4;
+
     app.stage.addChild(player);
+
+    // var moon = state.moon = new MultiAnimatedSprite(resources.moon.spritesheet);
+    // moon.x = app.view.width / 4;
+    // moon.y = app.view.height / 4;
+    // app.stage.addChild(moon);
+    
     app.ticker.add(tick);
 }
 
@@ -177,8 +186,8 @@ document.body.onmouseup = function (e) {
     // console.log("onmouseup: ", e);
 
     let bullet = new PIXI.Sprite(app.loader.resources.bullet.texture);
-    bullet.x = state.player.x + 145; // change to gun.x || arm.x
-    bullet.y = state.player.y + 115;
+    bullet.x = state.player.x + 155; // change to gun.x || arm.x
+    bullet.y = state.player.y + 130;
     app.stage.addChild(bullet);
     bullets.push(bullet);
 
