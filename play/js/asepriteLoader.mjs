@@ -86,22 +86,25 @@ function tick() {
     
     if (state.keys['click']) {
         state.player.setAnimation('Shoot');
+    } else if (state.keys['Space']) {
+        state.player.setAnimation('Jump');
+        console.log("Jump!");
     } else if (state.keys["KeyA"]) {
-        // state.player.setAnimation('Walk');
+        state.player.setAnimation('RunLeft');
         state.player.x -= playerSpeed;
-        console.log("player is walking west");
+        console.log("running left!");
     } else if (state.keys["KeyW"]) {
         // state.player.setAnimation('Walk');
         state.player.y -= playerSpeed;
-        console.log("player is walking north");
+        console.log("running up!");
     } else if (state.keys["KeyD"]) {
-        // state.player.setAnimation('Walk');
+        state.player.setAnimation('RunRight');
         state.player.x += playerSpeed;
-        console.log("player is walking east");
+        console.log("running right!");
     } else if (state.keys["KeyS"]) {
         // state.player.setAnimation('Walk');
         state.player.y += playerSpeed;
-        console.log("player is walking south");
+        console.log("running down!");
     } else {
         state.player.setAnimation('Idle');
     }
@@ -218,8 +221,8 @@ document.body.onmouseup = function (e) {
 
     let bullet = new PIXI.Sprite(app.loader.resources.bullet.texture);
     // should read arm offsets from character json sprite sheet file here
-    bullet.x = state.player.x + 175; // 155; // spaceman
-    bullet.y = state.player.y + 32; // 130; // spaceman
+    bullet.x = state.player.x + 140; // 155; // spaceman
+    bullet.y = state.player.y + 115; // 130; // spaceman
     app.stage.addChild(bullet);
     bullets.push(bullet);
 
