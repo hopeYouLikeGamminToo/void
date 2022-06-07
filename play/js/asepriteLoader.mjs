@@ -42,6 +42,7 @@ var MultiAnimatedSprite = /** @class */ (function (_super) {
     function MultiAnimatedSprite(spritesheet) {
         var _this = _super.call(this) || this;
         _this.spritesheet = spritesheet;
+        console.log("spritesheet: ", spritesheet);
         _this.scale.x = _this.scale.y = 1;
         var defaultAnimation = Object.keys(spritesheet.animations)[0];
         _this.setAnimation(defaultAnimation);
@@ -83,31 +84,54 @@ var bullets = [];
 function tick() {
     updateBullets();
     
-    if (state.keys['Space']) {
-        state.player.setAnimation('Jump');
-    } else if (state.keys['click']) {
+    if (state.keys['click']) {
         state.player.setAnimation('Shoot');
     } else if (state.keys["KeyA"]) {
-        state.player.setAnimation('Walk');
-        console.log("player is walking west");
+        // state.player.setAnimation('Walk');
         state.player.x -= playerSpeed;
+        console.log("player is walking west");
     } else if (state.keys["KeyW"]) {
-        state.player.setAnimation('Walk');
+        // state.player.setAnimation('Walk');
         state.player.y -= playerSpeed;
         console.log("player is walking north");
     } else if (state.keys["KeyD"]) {
-        state.player.setAnimation('Walk');
+        // state.player.setAnimation('Walk');
         state.player.x += playerSpeed;
         console.log("player is walking east");
     } else if (state.keys["KeyS"]) {
-        state.player.setAnimation('Walk');
+        // state.player.setAnimation('Walk');
         state.player.y += playerSpeed;
         console.log("player is walking south");
-    }
-    else {
+    } else {
         state.player.setAnimation('Idle');
-        // state.moon.setAnimation('Idle');
     }
+
+    // spaceman assets supports this
+    // if (state.keys['Space']) {
+    //     state.player.setAnimation('Jump');
+    // } else if (state.keys['click']) {
+    //     state.player.setAnimation('Shoot');
+    // } else if (state.keys["KeyA"]) {
+    //     state.player.setAnimation('Walk');
+    //     console.log("player is walking west");
+    //     state.player.x -= playerSpeed;
+    // } else if (state.keys["KeyW"]) {
+    //     state.player.setAnimation('Walk');
+    //     state.player.y -= playerSpeed;
+    //     console.log("player is walking north");
+    // } else if (state.keys["KeyD"]) {
+    //     state.player.setAnimation('Walk');
+    //     state.player.x += playerSpeed;
+    //     console.log("player is walking east");
+    // } else if (state.keys["KeyS"]) {
+    //     state.player.setAnimation('Walk');
+    //     state.player.y += playerSpeed;
+    //     console.log("player is walking south");
+    // }
+    // else {
+    //     state.player.setAnimation('Idle');
+    //     // state.moon.setAnimation('Idle');
+    // }
 }
 
 function updateBullets() {
@@ -144,7 +168,8 @@ app.loader
     }
     next();
 })
-    .add('player', 'spaceman/spaceman.json')
+    // .add('player', 'spaceman.json')
+    .add('player', 'kraken.json')
     .add("bullet", "bullet.png")
     .add("moon", "moon.json").load(setup);
 
@@ -154,6 +179,12 @@ function setup(loader, resources) {
     player.y = app.view.height / 4;
 
     app.stage.addChild(player);
+
+    // var player2 = state.player2 = new MultiAnimatedSprite(resources.player2.spritesheet);
+    // player2.x = app.view.width / 4;
+    // player2.y = app.view.height / 4;
+
+    // app.stage.addChild(player2);
 
     // var moon = state.moon = new MultiAnimatedSprite(resources.moon.spritesheet);
     // moon.x = app.view.width / 4;
@@ -186,8 +217,9 @@ document.body.onmouseup = function (e) {
     // console.log("onmouseup: ", e);
 
     let bullet = new PIXI.Sprite(app.loader.resources.bullet.texture);
-    bullet.x = state.player.x + 155; // change to gun.x || arm.x
-    bullet.y = state.player.y + 130;
+    // should read arm offsets from character json sprite sheet file here
+    bullet.x = state.player.x + 175; // 155; // spaceman
+    bullet.y = state.player.y + 32; // 130; // spaceman
     app.stage.addChild(bullet);
     bullets.push(bullet);
 

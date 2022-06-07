@@ -1,0 +1,46 @@
+{ "frames": {
+   "kraken0": {
+    "frame": { "x": 0, "y": 0, "w": 194, "h": 125 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 194, "h": 125 },
+    "sourceSize": { "w": 194, "h": 125 },
+    "duration": 100
+   },
+   "kraken1": {
+    "frame": { "x": 194, "y": 0, "w": 194, "h": 125 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 194, "h": 125 },
+    "sourceSize": { "w": 194, "h": 125 },
+    "duration": 100
+   },
+   "kraken2": {
+    "frame": { "x": 388, "y": 0, "w": 194, "h": 125 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 194, "h": 125 },
+    "sourceSize": { "w": 194, "h": 125 },
+    "duration": 100
+   }
+ },
+ "animations": {
+  "Idle": ["kraken0"],
+	"Shoot": ["kraken0","kraken1","kraken2"]
+ },
+ "meta": {
+  "app": "https://www.aseprite.org/",
+  "version": "1.3-beta16-x64",
+  "image": "kraken.png",
+  "format": "RGBA8888",
+  "size": { "w": 582, "h": 125 },
+  "scale": "1",
+  "frameTags": [
+  ],
+  "layers": [
+   { "name": "colored", "opacity": 255, "blendMode": "normal" }
+  ],
+  "slices": [
+  ]
+ }
+}

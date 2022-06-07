@@ -1,3 +1,19 @@
+/**********************************
+ * 
+ * 
+ * 
+ *  In the process of redoing this...
+ *  See asepriteLoader.mjs
+ * 
+ * 
+ * 
+ *********************************/
+
+
+
+
+
+
 // import extern modules
 import {
     AnimatedSprite, Application, BaseTexture,
