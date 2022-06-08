@@ -86,25 +86,26 @@ function tick() {
     
     if (state.keys['click']) {
         state.player.setAnimation('Shoot');
+        console.log("shoot!");
     } else if (state.keys['Space']) {
         state.player.setAnimation('Jump');
-        console.log("Jump!");
+        console.log("jump!");
     } else if (state.keys["KeyA"]) {
         state.player.setAnimation('RunLeft');
         state.player.x -= playerSpeed;
-        console.log("running left!");
+        console.log("run left!");
     } else if (state.keys["KeyW"]) {
-        // state.player.setAnimation('Walk');
+        state.player.setAnimation('Jump');
         state.player.y -= playerSpeed;
-        console.log("running up!");
+        console.log("jump!");
     } else if (state.keys["KeyD"]) {
         state.player.setAnimation('RunRight');
         state.player.x += playerSpeed;
-        console.log("running right!");
+        console.log("run right!");
     } else if (state.keys["KeyS"]) {
-        // state.player.setAnimation('Walk');
-        state.player.y += playerSpeed;
-        console.log("running down!");
+        state.player.setAnimation('Duck');
+        // state.player.y += playerSpeed;
+        console.log("duck!");
     } else {
         state.player.setAnimation('Idle');
     }
