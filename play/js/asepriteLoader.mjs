@@ -29,8 +29,8 @@ var app = new PIXI.Application({
     autoResize: true,
     resizeTo: window,
     resolution: devicePixelRatio,
-    width: window.outerWidth,
-    height: window.outerHeight,
+    width: window.outerWidth, // window.outerWidth,
+    height: window.outerHeight, // window.outerHeight,
     backgroundColor: 0x000000,
     autoDensity: true
 });
@@ -96,46 +96,20 @@ function tick() {
         console.log("run left!");
     } else if (state.keys["KeyW"]) {
         state.player.setAnimation('Jump');
-        state.player.y -= playerSpeed;
+        // state.player.y -= playerSpeed;
         console.log("jump!");
     } else if (state.keys["KeyD"]) {
         state.player.setAnimation('RunRight');
         state.player.x += playerSpeed;
         console.log("run right!");
     } else if (state.keys["KeyS"]) {
+        // if touching platform > duck, else accelerate
         state.player.setAnimation('Duck');
         // state.player.y += playerSpeed;
         console.log("duck!");
     } else {
         state.player.setAnimation('Idle');
     }
-
-    // spaceman assets supports this
-    // if (state.keys['Space']) {
-    //     state.player.setAnimation('Jump');
-    // } else if (state.keys['click']) {
-    //     state.player.setAnimation('Shoot');
-    // } else if (state.keys["KeyA"]) {
-    //     state.player.setAnimation('Walk');
-    //     console.log("player is walking west");
-    //     state.player.x -= playerSpeed;
-    // } else if (state.keys["KeyW"]) {
-    //     state.player.setAnimation('Walk');
-    //     state.player.y -= playerSpeed;
-    //     console.log("player is walking north");
-    // } else if (state.keys["KeyD"]) {
-    //     state.player.setAnimation('Walk');
-    //     state.player.x += playerSpeed;
-    //     console.log("player is walking east");
-    // } else if (state.keys["KeyS"]) {
-    //     state.player.setAnimation('Walk');
-    //     state.player.y += playerSpeed;
-    //     console.log("player is walking south");
-    // }
-    // else {
-    //     state.player.setAnimation('Idle');
-    //     // state.moon.setAnimation('Idle');
-    // }
 }
 
 function updateBullets() {
@@ -201,6 +175,9 @@ function setup(loader, resources) {
 document.body.onkeydown = function (e) {
     console.log("onkeydown: ", e.code);
     state.keys[e.code] = true;
+    if(e.code == "Space") {
+        e.preventDefault(); // prevent spacebar scrolling
+    }
 };
 document.body.onkeyup = function (e) {
     console.log("onkeykeyup: ", e.code);
