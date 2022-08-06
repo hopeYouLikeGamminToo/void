@@ -5,7 +5,8 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
+    <link href="./styles/chat.css" rel="stylesheet">
+    <!-- <style>
         @font-face {
             font-family: 'Pixelated';
             src: url('font/arcade-classic.ttf');
@@ -15,13 +16,38 @@
             font-family: 'Pixelated';
             font-size: 0px;
         }
-    </style>
+    </style> -->
 </head>
 
 <body>
-    <div id="useFont">_</div>
-    <script src="./js/asepriteLoader.mjs" type="module"></script>
-    <style>
+    <script src="./js/app.mjs" type="module"></script>
+    <script src="./js/adapter.mjs"></script>
+    <div class="container" id="useFont">
+        <div class="infobox">
+            <input id="name" type="text" maxlength="12" required autocomplete="username" inputmode="verbatim"
+                placeholder="Username">
+            <input type="button" name="login" value="Log in" id="connect"> <!-- onclick="connect()"> -->
+        </div>
+        <ul class="userlistbox"></ul>
+        <div class="chatbox"></div>
+        <div class="camerabox">
+            <video id="received_video" autoplay></video>
+            <video id="local_video" autoplay muted></video>
+            <button id="hangup-button" role="button" disabled> <!-- onclick="hangUpCall();" -->
+                Hang Up
+            </button>
+        </div>
+        <div class="empty-container"></div>
+        <div class="chat-controls">
+            chat:
+            <input id="text" type="text" name="text" size="100" maxlength="256"
+                placeholder="Say something meaningful..." autocomplete="off" disabled>
+            <!-- onkeyup="handleKey(event)" disabled> -->
+            <input type="button" id="send" name="send" value="Send" disabled>
+            <!-- onclick="handleSendButton()" disabled> -->
+        </div>
+    </div>
+    <!-- <style>
         body {
             position: absolute;
             height: 100%;
@@ -30,7 +56,7 @@
             margin: 0;
             overflow: hidden;
         }
-    </style>
+    </style> -->
 </body>
 
 </html>

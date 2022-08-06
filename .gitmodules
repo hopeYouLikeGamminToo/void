@@ -10,3 +10,6 @@
 [submodule "submodules/AsepriteScripts"]
 	path = submodules/AsepriteScripts
 	url = https://github.com/PKGaspi/AsepriteScripts.git
+[submodule "submodules/samples-server"]
+	path = submodules/samples-server
+	url = https://github.com/mdn/samples-server.git
