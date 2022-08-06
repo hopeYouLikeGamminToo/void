@@ -30,7 +30,8 @@ var mediaConstraints = {
     }
 };
 
-var myUsername = null;
+var username = null;
+var character = null;
 var targetUsername = null;      // To store username of other peer
 var myPeerConnection = null;    // RTCPeerConnection
 var transceiver = null;         // RTCRtpTransceiver
@@ -70,11 +71,45 @@ function sendToServer(msg) {
 // this function sends a "username" message to set our username for this
 // session.
 function setUsername() {
-    myUsername = document.getElementById("name").value;
-    console.log("username: ", myUsername)
+    username = document.getElementById("name").value;
+    console.log("username: ", username)
+
+    // const characters = ["kraken", "spaceman"];
+    // const randomCharacter = Math.floor(Math.random() * characters.length);
+    // character = characters[randomCharacter];
+    // console.log("random character: ", character);
+
+
+    console.log("'kraken' in app.lodaer.resources: ", ("kraken" in app.loader.resources))
+    if ("kraken" in app.loader.resources) {
+        character = "spaceman";
+    } else {
+        character = "kraken";
+    }
+
+    app.loader
+    .use(function (resource, next) {
+        if (resource.extension === 'json' && resource.data.meta.app === 'http://www.aseprite.org/') {
+            for (var _i = 0, _a = resource.data.meta.frameTags; _i < _a.length; _i++) {
+                var tag = _a[_i];
+                var frames = [];
+                for (var i = tag.from; i < tag.to; i++) {
+                    frames.push({ texture: resource.textures[i], time: resource.data.frames[i].duration });
+                }
+                if (tag.direction === 'pingpong') {
+                    for (var i = tag.to; i >= tag.from; i--) {
+                        frames.push({ texture: resource.textures[i], time: resource.data.frames[i].duration });
+                    }
+                }
+                resource.spritesheet.animations[tag.name] = frames;
+            }
+        }
+        next();
+    })
+    .add(character, character + ".json").load(setup);
 
     sendToServer({
-        name: myUsername,
+        name: username,
         date: Date.now(),
         id: clientID,
         type: "username"
@@ -129,8 +164,8 @@ function connect() {
                 break;
 
             case "rejectusername":
-                myUsername = msg.name;
-                text = "<b>Your username has been set to <em>" + myUsername +
+                username = msg.name;
+                text = "<b>Your username has been set to <em>" + username +
                     "</em> because the name you chose is in use.</b><br>";
                 break;
 
@@ -255,7 +290,7 @@ async function handleNegotiationNeededEvent() {
         // Send the offer to the remote peer.
         log("---> Sending the offer to the remote peer");
         sendToServer({
-            name: myUsername,
+            name: username,
             target: targetUsername,
             type: "video-offer",
             sdp: myPeerConnection.localDescription
@@ -433,7 +468,7 @@ function hangUpCall() {
     closeVideoCall();
 
     sendToServer({
-        name: myUsername,
+        name: username,
         target: targetUsername,
         type: "hang-up"
     });
@@ -452,7 +487,7 @@ async function invite(evt) {
         var clickedUsername = evt.target.textContent;
 
         // Don't allow users to call themselves, because weird.
-        if (clickedUsername === myUsername) {
+        if (clickedUsername === username) {
             alert("I'm afraid I can't let you talk to yourself. That would be weird.");
             return;
         }
@@ -548,7 +583,7 @@ async function handleVideoOfferMsg(msg) {
     await myPeerConnection.setLocalDescription(await myPeerConnection.createAnswer());
 
     sendToServer({
-        name: myUsername,
+        name: username,
         target: targetUsername,
         type: "video-answer",
         sdp: myPeerConnection.localDescription
@@ -758,47 +793,36 @@ function updateBullets() {
 }
 
 // preload assets
+let active_players = [];
 app.loader.baseUrl = 'assets';
-app.loader
-    .use(function (resource, next) {
-        if (resource.extension === 'json' && resource.data.meta.app === 'http://www.aseprite.org/') {
-            for (var _i = 0, _a = resource.data.meta.frameTags; _i < _a.length; _i++) {
-                var tag = _a[_i];
-                var frames = [];
-                for (var i = tag.from; i < tag.to; i++) {
-                    frames.push({ texture: resource.textures[i], time: resource.data.frames[i].duration });
-                }
-                if (tag.direction === 'pingpong') {
-                    for (var i = tag.to; i >= tag.from; i--) {
-                        frames.push({ texture: resource.textures[i], time: resource.data.frames[i].duration });
-                    }
-                }
-                resource.spritesheet.animations[tag.name] = frames;
-            }
-        }
-        next();
-    })
-    // .add('player', 'spaceman.json')
-    .add('player', 'kraken.json')
-    .add("bullet", "bullet.png")
-    .add("moon", "moon.json").load(setup);
+app.loader.add("bullet", "bullet.png")
+        .add("moon", "moon.json").load(setup);
 
 function setup(loader, resources) {
     // setup input handlers
-    configureInputHandlers(); // pass input_type as argument (keyboard/mouse, gampepad, touch)
+    try{
+        configureInputHandlers(); // pass input_type as argument (keyboard/mouse, gampepad, touch)
+    } catch {
+        
+    }
+
+    console.log(resources);
 
     // create player
-    var player = state.player = new MultiAnimatedSprite(resources.player.spritesheet);
+    try{
+        switch (character) {
+            case "kraken":
+                var player = state.player = new MultiAnimatedSprite(resources.kraken.spritesheet);
+            case "spaceman":
+                var player = state.player = new MultiAnimatedSprite(resources.spaceman.spritesheet);
+            default:
+                console.log("character not available!")
+        }
+    } catch {}
     player.x = app.view.width / 4;
     player.y = app.view.height / 4;
 
     app.stage.addChild(player);
-
-    // var player2 = state.player2 = new MultiAnimatedSprite(resources.player2.spritesheet);
-    // player2.x = app.view.width / 4;
-    // player2.y = app.view.height / 4;
-
-    // app.stage.addChild(player2);
 
     // var moon = state.moon = new MultiAnimatedSprite(resources.moon.spritesheet);
     // moon.x = app.view.width / 4;
@@ -852,7 +876,7 @@ function configureInputHandlers() {
     document.body.onmousemove = function (e) {
         mouse.x = e.x;
         mouse.y = e.y;
-        mouse.angle = Math.atan2(mouse.y - state.player.y - 430, mouse.x - state.player.x) * 180 / Math.PI; // - 145; + 115
+        mouse.angle = Math.atan2(mouse.y - state.player.y - 530, mouse.x - state.player.x) * 180 / Math.PI; // - 145; + 115
     };
     window.addEventListener("gamepadconnected", function (e) {
         console.log("Gamepad connected at index %d: %s. %d buttons, %d axes.",
