@@ -13,3 +13,6 @@
 [submodule "submodules/samples-server"]
 	path = submodules/samples-server
 	url = https://github.com/mdn/samples-server.git
+[submodule "submodules/multiplayer-game-with-javascript"]
+	path = submodules/multiplayer-game-with-javascript
+	url = https://github.com/servetgulnaroglu/multiplayer-game-with-javascript.git

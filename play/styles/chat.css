@@ -17,7 +17,7 @@ button {
 
 .container {
     display: grid;
-    min-width: 1250px;
+    min-width: 700px;
     height: 100%;
     grid-template-areas: "infobox infobox infobox"
         "userlistbox chatbox camerabox"

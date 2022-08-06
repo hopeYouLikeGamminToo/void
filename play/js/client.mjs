@@ -876,7 +876,7 @@ function configureInputHandlers() {
     document.body.onmousemove = function (e) {
         mouse.x = e.x;
         mouse.y = e.y;
-        mouse.angle = Math.atan2(mouse.y - state.player.y - 530, mouse.x - state.player.x) * 180 / Math.PI; // - 145; + 115
+        mouse.angle = Math.atan2(mouse.y - state.player.y - 470, mouse.x - state.player.x) * 180 / Math.PI; // - 145; + 115
     };
     window.addEventListener("gamepadconnected", function (e) {
         console.log("Gamepad connected at index %d: %s. %d buttons, %d axes.",
