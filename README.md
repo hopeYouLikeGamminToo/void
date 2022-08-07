@@ -10,7 +10,7 @@
 >node server.js<br/>
 
 ### start client
->use vscode live server on index.html
+>use vscode live server on play/public/index.html
 
 <img src="./play/assets/kraken-sketch.jpeg" width="40%">
 <br/><br/>
