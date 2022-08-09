@@ -12,8 +12,8 @@
 ### start client
 >use vscode live server on play/public/index.html
 
-<img src="./play/assets/kraken-sketch.jpeg" width="40%">
+<img src="./play/public/assets/kraken-sketch.jpeg" width="40%">
 <br/><br/>
-<img src="./play/assets/aseprite/gifs/kraken.gif">
+<img src="./play/public/assets/aseprite/gifs/kraken.gif">
 <br/><br/>
-<img src="./play/assets/progress.png" width="100%">
+<img src="./play/public/assets/progress.png" width="100%">
