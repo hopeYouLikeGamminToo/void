@@ -753,7 +753,9 @@ function gameLoop() {
 
     if (input_type == "gamepad"){
         var gamepads = navigator.getGamepads();
-        console.log(gamepads[0]);
+        if (gamepads[0].buttons.some((elem) => elem.pressed == 1) || gamepads[0].axes.some((elem) => elem >= 0.2) || gamepads[0].axes.some((elem) => elem <= -0.2)) {
+            console.log(gamepads[0]);
+        }
         if (gamepads[0].buttons[7].value) {
             state.player.setAnimation('Shoot');
             console.log("shoot!");
