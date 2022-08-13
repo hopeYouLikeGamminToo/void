@@ -758,13 +758,30 @@ function gameLoop() {
             state.player.setAnimation('Shoot');
             console.log("shoot!");
             if (mouse.y > 400) {
+                var direction = new PIXI.Point();
+                direction.x = mouse.x - player.x;
+                direction.y = mouse.y - player.y - 526;
+              
+                //Normalize
+                let length = Math.sqrt( direction.x*direction.x + direction.y*direction.y);
+                direction.x/=length;
+                direction.y/=length;
+              
                 let bullet = new PIXI.Sprite(app.loader.resources.bullet.texture);
-                // should read arm offsets from character json sprite sheet file here
                 bullet.x = state.player.x + 140; // 155; // spaceman
                 bullet.y = state.player.y + 115; // 130; // spaceman
-                app.stage.addChild(bullet);
+                console.log("bullet direction: ", direction);
+                bullet.direction = direction;
                 bullets.push(bullet);
-                delete state.keys["click"];
+                app.stage.addChild(bullet);
+                
+                // let bullet = new PIXI.Sprite(app.loader.resources.bullet.texture);
+                // // should read arm offsets from character json sprite sheet file here
+                // bullet.x = state.player.x + 140; // 155; // spaceman
+                // bullet.y = state.player.y + 115; // 130; // spaceman
+                // app.stage.addChild(bullet);
+                // bullets.push(bullet);
+                // delete state.keys["click"];
             } else {
                 // console.log("clicked in chat");
             }
