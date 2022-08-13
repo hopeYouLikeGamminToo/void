@@ -7,7 +7,8 @@
 >node server.js<br/>
 
 ### To Run From WSL2
->change hostname in play/public/js/client.mjs to equal wsl2 ip address <br/>
+>execute wsl.sh script from wsl terminal before starting signaling server<br/>
+>wsl.sh will automate changing the hostname in client.mjs to your wsl terminal ip address<br/>
 <img src="./play/public/assets/wsl2-ifconfig.png" width="30%"><br/>
 <img src="./play/public/assets/wsl2-hostname.png" width="30%"><br/>
 
