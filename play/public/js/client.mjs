@@ -835,14 +835,19 @@ function gameLoop() {
             // app.stage.addChild(bullet);
             // bullets.push(bullet);
             // delete state.keys["click"];
+        } else if (gamepads[0].buttons[3].value || gamepads[0].axes[1] < -0.50) {
+            state.player.setAnimation('Jump');
+            state.player.y -= playerSpeed + jumpSpeed;
+            console.log("jump!");
+            if (gamepads[0].axes[0] < -0.10) {
+                state.player.x -= playerSpeed;
+            } else if (gamepads[0].axes[0] > 0.10) {
+                state.player.x += playerSpeed;
+            } 
         } else if (gamepads[0].axes[0] < -0.10) {
             state.player.setAnimation('RunLeft');
             state.player.x -= playerSpeed * -1 * gamepads[0].axes[0];
             console.log("run left!");
-        } else if (gamepads[0].buttons[3].value || gamepads[0].axes[1] < -0.50) {
-            state.player.setAnimation('Jump');
-            // state.player.y -= playerSpeed;
-            console.log("jump!");
         } else if (gamepads[0].axes[0] > 0.10) {
             state.player.setAnimation('RunRight');
             state.player.x += playerSpeed * gamepads[0].axes[0];
