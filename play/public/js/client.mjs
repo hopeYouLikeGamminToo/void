@@ -926,13 +926,9 @@ function configureInputHandlers() {
         // mouse.x = e.x;
         // mouse.y = e.y;
         // mouse.angle = Math.atan2(mouse.y - state.player.y, mouse.x - state.player.x) * 180 / Math.PI;
-
-        if (mouse.y > 400) {
-            state.keys["click"] = true;
-            console.log("player {" + state.player.x + "," + state.player.y + "} " + "fires at {" + mouse.x + "," + mouse.y + "}");
-        } else {
-            console.log("clicked in chat");
-        }
+        
+        state.keys["click"] = true;
+        console.log("player {" + state.player.x + "," + state.player.y + "} " + "fires at {" + mouse.x + "," + mouse.y + "}");
     };
     document.body.onmouseup = function (e) {
         // console.log("onmouseup: ", e);
