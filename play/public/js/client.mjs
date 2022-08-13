@@ -88,25 +88,25 @@ function setUsername() {
     }
 
     app.loader
-    .use(function (resource, next) {
-        if (resource.extension === 'json' && resource.data.meta.app === 'http://www.aseprite.org/') {
-            for (var _i = 0, _a = resource.data.meta.frameTags; _i < _a.length; _i++) {
-                var tag = _a[_i];
-                var frames = [];
-                for (var i = tag.from; i < tag.to; i++) {
-                    frames.push({ texture: resource.textures[i], time: resource.data.frames[i].duration });
-                }
-                if (tag.direction === 'pingpong') {
-                    for (var i = tag.to; i >= tag.from; i--) {
+        .use(function (resource, next) {
+            if (resource.extension === 'json' && resource.data.meta.app === 'http://www.aseprite.org/') {
+                for (var _i = 0, _a = resource.data.meta.frameTags; _i < _a.length; _i++) {
+                    var tag = _a[_i];
+                    var frames = [];
+                    for (var i = tag.from; i < tag.to; i++) {
                         frames.push({ texture: resource.textures[i], time: resource.data.frames[i].duration });
                     }
+                    if (tag.direction === 'pingpong') {
+                        for (var i = tag.to; i >= tag.from; i--) {
+                            frames.push({ texture: resource.textures[i], time: resource.data.frames[i].duration });
+                        }
+                    }
+                    resource.spritesheet.animations[tag.name] = frames;
                 }
-                resource.spritesheet.animations[tag.name] = frames;
             }
-        }
-        next();
-    })
-    .add(character, character + ".json").load(setup);
+            next();
+        })
+        .add(character, character + ".json").load(setup);
 
     sendToServer({
         name: username,
@@ -745,13 +745,65 @@ var mouse = {
     "angle": 0
 }
 
+// (keyboard/mouse, gampepad, touch)
+let input_type = "keyboard";
+var player;
+
+var gravity = 7;
+var jumpSpeed = 10;
 var playerSpeed = 5;
 var bullets = [];
 
-function gameLoop() {
-    updateBullets();
+function collisionDetect(character, object) {
+    //Define the variables we'll need to calculate
+    let hit, combinedHalfWidths, combinedHalfHeights, vx, vy;
 
-    if (input_type == "gamepad"){
+    //hit will determine whether there's a collision
+    hit = false;
+
+    //Find the center points of each sprite
+    character.centerX = character.x + character.width / 2;
+    character.centerY = character.y + character.height / 2 - 20; // -20 to make character overlap platform a bit
+    object.centerX = object.x + object.width / 2;
+    object.centerY = object.y + object.height / 2;
+
+    //Find the half-widths and half-heights of each sprite
+    character.halfWidth = character.width / 2;
+    character.halfHeight = character.height / 2;
+    object.halfWidth = object.width / 2;
+    object.halfHeight = object.height / 2;
+
+    //Calculate the distance vector between the sprites
+    vx = character.centerX - object.centerX;
+    vy = character.centerY - object.centerY;
+
+    //Figure out the combined half-widths and half-heights
+    combinedHalfWidths = character.halfWidth + object.halfWidth;
+    combinedHalfHeights = character.halfHeight + object.halfHeight;
+
+    //Check for a collision on the x axis
+    if (Math.abs(vx) < combinedHalfWidths) {
+        //A collision might be occurring. Check for a collision on the y axis
+        if (Math.abs(vy) < combinedHalfHeights) {
+            //There's definitely a collision happening
+            hit = true;
+        } else {
+            //There's no collision on the y axis
+            hit = false;
+        }
+    } else {
+        //There's no collision on the x axis
+        hit = false;
+    }
+
+    //`hit` will be either `true` or `false`
+    return hit;
+};
+
+
+function gameLoop() {
+    // user input + positional logic
+    if (input_type == "gamepad") {
         var gamepads = navigator.getGamepads();
         if (gamepads[0].buttons.some((elem) => elem.pressed == 1) || gamepads[0].axes.some((elem) => elem >= 0.2) || gamepads[0].axes.some((elem) => elem <= -0.2)) {
             console.log(gamepads[0]);
@@ -762,12 +814,12 @@ function gameLoop() {
             var direction = new PIXI.Point();
             direction.x = mouse.x - player.x;
             direction.y = mouse.y - player.y - 526;
-        
+
             //Normalize
-            let length = Math.sqrt( direction.x*direction.x + direction.y*direction.y);
-            direction.x/=length;
-            direction.y/=length;
-        
+            let length = Math.sqrt(direction.x * direction.x + direction.y * direction.y);
+            direction.x /= length;
+            direction.y /= length;
+
             let bullet = new PIXI.Sprite(app.loader.resources.bullet.texture);
             bullet.x = state.player.x + 140; // 155; // spaceman
             bullet.y = state.player.y + 115; // 130; // spaceman
@@ -775,7 +827,7 @@ function gameLoop() {
             bullet.direction = direction;
             bullets.push(bullet);
             app.stage.addChild(bullet);
-            
+
             // let bullet = new PIXI.Sprite(app.loader.resources.bullet.texture);
             // // should read arm offsets from character json sprite sheet file here
             // bullet.x = state.player.x + 140; // 155; // spaceman
@@ -785,7 +837,7 @@ function gameLoop() {
             // delete state.keys["click"];
         } else if (gamepads[0].axes[0] < -0.10) {
             state.player.setAnimation('RunLeft');
-            state.player.x -= playerSpeed * -1*gamepads[0].axes[0];
+            state.player.x -= playerSpeed * -1 * gamepads[0].axes[0];
             console.log("run left!");
         } else if (gamepads[0].buttons[3].value || gamepads[0].axes[1] < -0.50) {
             state.player.setAnimation('Jump');
@@ -811,14 +863,19 @@ function gameLoop() {
         } else if (state.keys['Space']) {
             // state.player.setAnimation('Jump');
             console.log("space!");
+        } else if (state.keys["KeyW"]) {
+            state.player.setAnimation('Jump');
+            state.player.y -= playerSpeed + jumpSpeed; // jump speed
+            console.log("jump!");
+            if (state.keys["KeyA"]) {
+                state.player.x -= playerSpeed;
+            } else if (state.keys["KeyD"]) {
+                state.player.x += playerSpeed;
+            } 
         } else if (state.keys["KeyA"]) {
             state.player.setAnimation('RunLeft');
             state.player.x -= playerSpeed;
             console.log("run left!");
-        } else if (state.keys["KeyW"]) {
-            state.player.setAnimation('Jump');
-            // state.player.y -= playerSpeed;
-            console.log("jump!");
         } else if (state.keys["KeyD"]) {
             state.player.setAnimation('RunRight');
             state.player.x += playerSpeed;
@@ -832,14 +889,25 @@ function gameLoop() {
             state.player.setAnimation('Idle');
         }
     }
+    updateBullets();
+
+    //detect collisions
+    let collision = collisionDetect(player, rectangle1) || collisionDetect(player, rectangle2) || collisionDetect(player, roundBox);
+    if (collision) {
+        console.log("collision detected!");
+    } else {
+        state.player.y += gravity;
+    }
+
+    //resolve collisions
 }
 
 function updateBullets() {
     let speed = 15;
     for (let i = 0; i < bullets.length; i++) {
         let bullet = bullets[i];
-        bullet.x += bullet.direction.x*speed;
-        bullet.y += bullet.direction.y*speed;
+        bullet.x += bullet.direction.x * speed;
+        bullet.y += bullet.direction.y * speed;
         //Hit detection here
         if (bullet.y < 0) {
             app.stage.removeChild(bullet);
@@ -848,18 +916,15 @@ function updateBullets() {
     }
 }
 
-// (keyboard/mouse, gampepad, touch)
-let input_type = "keyboard";
-var player;
-
 // preload assets
 app.loader.baseUrl = 'assets';
 app.loader.add("bullet", "bullet.png")
-        .add("moon", "moon.json").load();
+    .add("moon", "moon.json").load();
 
+// replace with load map fxn here
 // create a couple pixi shapes to act as platforms & start working on collision physics
 const rectangle1 = new PIXI.Graphics();
-rectangle1.lineStyle({width: 4, color: 0x575757, alpha: 1});
+rectangle1.lineStyle({ width: 4, color: 0x575757, alpha: 1 });
 rectangle1.beginFill(0xDAFFFF);
 rectangle1.drawRoundedRect(0, 0, app.screen.width / 6, app.screen.height / 25, 10);
 rectangle1.endFill();
@@ -868,7 +933,7 @@ rectangle1.y = app.screen.height / 2;
 app.stage.addChild(rectangle1);
 
 const rectangle2 = new PIXI.Graphics();
-rectangle2.lineStyle({width: 4, color: 0x575757, alpha: 1});
+rectangle2.lineStyle({ width: 4, color: 0x575757, alpha: 1 });
 rectangle2.beginFill(0xDAFFFF);
 rectangle2.drawRoundedRect(0, 0, app.screen.width / 6, app.screen.height / 25, 10);
 rectangle2.endFill();
@@ -877,7 +942,7 @@ rectangle2.y = app.screen.height / 2;
 app.stage.addChild(rectangle2);
 
 const roundBox = new PIXI.Graphics();
-roundBox.lineStyle({width: 4, color: 0x575757, alpha: 1});
+roundBox.lineStyle({ width: 4, color: 0x575757, alpha: 1 });
 roundBox.beginFill(0xABABAB);
 roundBox.drawRoundedRect(0, 0, app.screen.width / 2, app.screen.height / 25, 10);
 roundBox.endFill();
@@ -889,7 +954,7 @@ function setup(loader, resources) {
     console.log(resources);
 
     // create player
-    try{
+    try {
         switch (character) {
             case "kraken":
                 player = state.player = new MultiAnimatedSprite(resources.kraken.spritesheet);
@@ -898,7 +963,7 @@ function setup(loader, resources) {
             default:
                 console.log("character not available!")
         }
-    } catch {}
+    } catch { }
     player.x = app.screen.width / 8;
     player.y = app.screen.height / 4;
 
@@ -926,7 +991,7 @@ function configureInputHandlers() {
         // mouse.x = e.x;
         // mouse.y = e.y;
         // mouse.angle = Math.atan2(mouse.y - state.player.y, mouse.x - state.player.x) * 180 / Math.PI;
-        
+
         state.keys["click"] = true;
         console.log("player {" + state.player.x + "," + state.player.y + "} " + "fires at {" + mouse.x + "," + mouse.y + "}");
     };
@@ -935,12 +1000,12 @@ function configureInputHandlers() {
         var direction = new PIXI.Point();
         direction.x = e.pageX - player.x;
         direction.y = e.pageY - player.y - 526;
-        
+
         //Normalize
-        let length = Math.sqrt( direction.x*direction.x + direction.y*direction.y);
-        direction.x/=length;
-        direction.y/=length;
-        
+        let length = Math.sqrt(direction.x * direction.x + direction.y * direction.y);
+        direction.x /= length;
+        direction.y /= length;
+
         let bullet = new PIXI.Sprite(app.loader.resources.bullet.texture);
         bullet.x = state.player.x + 140; // 155; // spaceman
         bullet.y = state.player.y + 115; // 130; // spaceman
@@ -968,7 +1033,7 @@ function configureInputHandlers() {
         console.log("Gamepad connected at index %d: %s. %d buttons, %d axes.",
             e.gamepad.index, e.gamepad.id,
             e.gamepad.buttons.length, e.gamepad.axes.length);
-        
+
         let switch_input = window.confirm("Switch input to gamepad?");
         if (switch_input) {
             input_type = "gamepad";
