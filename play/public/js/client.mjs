@@ -823,8 +823,9 @@ function updateBullets() {
     let speed = 15;
     for (let i = 0; i < bullets.length; i++) {
         let bullet = bullets[i];
-        bullet.x += Math.cos(mouse.angle * Math.PI / 180) * speed;
-        bullet.y += Math.sin(mouse.angle * Math.PI / 180) * speed;
+        bullet.x += bullet.direction.x*speed;
+        bullet.y += bullet.direction.y*speed;
+        //Hit detection here
         if (bullet.y < 0) {
             app.stage.removeChild(bullet);
             bullets.splice(i, 1);
@@ -832,13 +833,42 @@ function updateBullets() {
     }
 }
 
+// (keyboard/mouse, gampepad, touch)
+let input_type = "keyboard";
+var player;
+
 // preload assets
 app.loader.baseUrl = 'assets';
 app.loader.add("bullet", "bullet.png")
         .add("moon", "moon.json").load();
 
-let input_type = "keyboard" // (keyboard/mouse, gampepad, touch)
-configureInputHandlers();
+// create a couple pixi shapes to act as platforms & start working on collision physics
+const rectangle1 = new PIXI.Graphics();
+rectangle1.lineStyle({width: 4, color: 0x575757, alpha: 1});
+rectangle1.beginFill(0xDAFFFF);
+rectangle1.drawRoundedRect(0, 0, app.screen.width / 6, app.screen.height / 25, 10);
+rectangle1.endFill();
+rectangle1.x = app.screen.width / 1.33;
+rectangle1.y = app.screen.height / 2;
+app.stage.addChild(rectangle1);
+
+const rectangle2 = new PIXI.Graphics();
+rectangle2.lineStyle({width: 4, color: 0x575757, alpha: 1});
+rectangle2.beginFill(0xDAFFFF);
+rectangle2.drawRoundedRect(0, 0, app.screen.width / 6, app.screen.height / 25, 10);
+rectangle2.endFill();
+rectangle2.x = app.screen.width / 12;
+rectangle2.y = app.screen.height / 2;
+app.stage.addChild(rectangle2);
+
+const roundBox = new PIXI.Graphics();
+roundBox.lineStyle({width: 4, color: 0x575757, alpha: 1});
+roundBox.beginFill(0xABABAB);
+roundBox.drawRoundedRect(0, 0, app.screen.width / 2, app.screen.height / 25, 10);
+roundBox.endFill();
+roundBox.x = app.screen.width / 4;
+roundBox.y = app.screen.height / 1.3;
+app.stage.addChild(roundBox);
 
 function setup(loader, resources) {
     console.log(resources);
@@ -847,17 +877,19 @@ function setup(loader, resources) {
     try{
         switch (character) {
             case "kraken":
-                var player = state.player = new MultiAnimatedSprite(resources.kraken.spritesheet);
+                player = state.player = new MultiAnimatedSprite(resources.kraken.spritesheet);
             case "spaceman":
-                var player = state.player = new MultiAnimatedSprite(resources.spaceman.spritesheet);
+                player = state.player = new MultiAnimatedSprite(resources.spaceman.spritesheet);
             default:
                 console.log("character not available!")
         }
     } catch {}
-    player.x = app.view.width / 4;
-    player.y = app.view.height / 4;
+    player.x = app.screen.width / 8;
+    player.y = app.screen.height / 4;
 
     app.stage.addChild(player);
+
+    configureInputHandlers();
 
     app.ticker.add(gameLoop);
 }
@@ -876,10 +908,9 @@ function configureInputHandlers() {
     };
     document.body.onmousedown = function (e) {
         console.log("onclick: ", e);
-
-        mouse.x = e.x;
-        mouse.y = e.y;
-        mouse.angle = Math.atan2(mouse.y - state.player.y - 520, mouse.x - state.player.x) * 180 / Math.PI;
+        // mouse.x = e.x;
+        // mouse.y = e.y;
+        // mouse.angle = Math.atan2(mouse.y - state.player.y, mouse.x - state.player.x) * 180 / Math.PI;
 
         if (mouse.y > 400) {
             state.keys["click"] = true;
@@ -891,13 +922,32 @@ function configureInputHandlers() {
     document.body.onmouseup = function (e) {
         // console.log("onmouseup: ", e);
         if (mouse.y > 400) {
+            var direction = new PIXI.Point();
+            direction.x = e.x - player.x;
+            direction.y = e.y - player.y - 526;
+          
+            //Normalize
+            let length = Math.sqrt( direction.x*direction.x + direction.y*direction.y);
+            direction.x/=length;
+            direction.y/=length;
+          
             let bullet = new PIXI.Sprite(app.loader.resources.bullet.texture);
-            // should read arm offsets from character json sprite sheet file here
             bullet.x = state.player.x + 140; // 155; // spaceman
             bullet.y = state.player.y + 115; // 130; // spaceman
-            app.stage.addChild(bullet);
+            console.log("bullet direction: ", direction);
+            bullet.direction = direction;
             bullets.push(bullet);
+            app.stage.addChild(bullet);
             delete state.keys["click"];
+
+
+            // let bullet = new PIXI.Sprite(app.loader.resources.bullet.texture);
+            // // should read arm offsets from character json sprite sheet file here
+            // bullet.x = state.player.x + 140; // 155; // spaceman
+            // bullet.y = state.player.y + 115; // 130; // spaceman
+            // app.stage.addChild(bullet);
+            // bullets.push(bullet);
+            // delete state.keys["click"];
         } else {
             // console.log("clicked in chat");
         }
