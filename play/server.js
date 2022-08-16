@@ -1,28 +1,4 @@
-//#!/usr/bin/env node
-//
-// WebSocket chat server
-// Implemented using Node.js
-//
-// Requires the websocket module.
-//
-// WebSocket and WebRTC based multi-user chat sample with two-way video
-// calling, including use of TURN if applicable or necessary.
-//
-// This file contains the JavaScript code that implements the server-side
-// functionality of the chat system, including user ID management, message
-// reflection, and routing of private messages, including support for
-// sending through unknown JSON objects to support custom apps and signaling
-// for WebRTC.
-//
-// Requires Node.js and the websocket module (WebSocket-Node):
-//
-//  - http://nodejs.org/
-//  - https://github.com/theturtle32/WebSocket-Node
-//
-// To read about how this sample works:  http://bit.ly/webrtc-from-chat
-//
-// Any copyright is dedicated to the Public Domain.
-// http://creativecommons.org/publicdomain/zero/1.0/
+// http://bit.ly/webrtc-from-chat
 
 "use strict";
 
@@ -33,18 +9,15 @@ var WebSocketServer = require('websocket').server;
 
 // Pathnames of the SSL key and certificate files to use for
 // HTTPS connections.
-
 const keyFilePath = "/etc/pki/tls/private/mdn-samples.mozilla.org.key";
 const certFilePath = "/etc/pki/tls/certs/mdn-samples.mozilla.org.crt";
 
 // Used for managing the text chat user list.
-
 var connectionArray = [];
 var nextID = Date.now();
 var appendToMakeUnique = 1;
 
 // Output logging information to console
-
 function log(text) {
   var time = new Date();
 
@@ -143,7 +116,6 @@ function sendUserListToAll() {
 
 // Try to load the key and certificate files for SSL so we can
 // do HTTPS (required for non-local WebRTC).
-
 var httpsOptions = {
   key: null,
   cert: null
@@ -164,7 +136,6 @@ try {
 
 // If we were able to get the key and certificate files, try to
 // start up an HTTPS server.
-
 var webServer = null;
 
 try {
@@ -189,7 +160,6 @@ if (!webServer) {
 // connections, so every request just returns 404. Real Web
 // requests are handled by the main server on the box. If you
 // want to, you can return real HTML here and serve Web content.
-
 function handleWebRequest(request, response) {
   log ("Received request for " + request.url);
   response.writeHead(404);
@@ -198,7 +168,6 @@ function handleWebRequest(request, response) {
 
 // Spin up the HTTPS server on the port assigned to this sample.
 // This will be turned into a WebSocket port very shortly.
-
 webServer.listen(6503, function() {
   log("Server is listening on port 6503");
 });
@@ -239,7 +208,6 @@ wsServer.on('request', function(request) {
 
   // Send the new client its token; it send back a "username" message to
   // tell us what username they want to use.
-
   var msg = {
     type: "id",
     id: connection.clientID
@@ -250,13 +218,11 @@ wsServer.on('request', function(request) {
   // is a message sent by a client, and may be text to share with other
   // users, a private message (text or signaling) for one user, or a command
   // to the server.
-
   connection.on('message', function(message) {
     if (message.type === 'utf8') {
       log("Received Message: " + message.utf8Data);
 
       // Process incoming data.
-
       var sendToClients = true;
       msg = JSON.parse(message.utf8Data);
       var connect = getConnectionForID(msg.id);
@@ -266,7 +232,6 @@ wsServer.on('request', function(request) {
       // since they may be used to implement client-side features.
       // Messages with a "target" property are sent only to a user
       // by that name.
-
       switch(msg.type) {
         // Public, textual message
         case "message":
@@ -314,7 +279,6 @@ wsServer.on('request', function(request) {
       // pass through any messages not specifically handled
       // in the select block above. This allows the clients to
       // exchange signaling and other control objects unimpeded.
-
       if (sendToClients) {
         var msgString = JSON.stringify(msg);
         var i;

@@ -16,3 +16,15 @@
 [submodule "submodules/multiplayer-game-with-javascript"]
 	path = submodules/multiplayer-game-with-javascript
 	url = https://github.com/servetgulnaroglu/multiplayer-game-with-javascript.git
+[submodule "submodules/smash"]
+	path = submodules/smash
+	url = https://github.com/guillaume-gouchon/smash.js.git
+[submodule "submodules/matter-pixi"]
+	path = submodules/matter-pixi
+	url = https://github.com/celsowhite/matter-pixi.git
+[submodule "submodules/matter-js"]
+	path = submodules/matter-js
+	url = https://github.com/liabru/matter-js.git
+[submodule "submodules/stats"]
+	path = submodules/stats
+	url = https://github.com/mrdoob/stats.js.git
