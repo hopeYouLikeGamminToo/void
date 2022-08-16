@@ -3,4 +3,4 @@ ip=$(cat ./tmp-ip.txt)
 echo -e "changing hostname to: ${ip}\n..."
 sed -i "s,window.location.hostname,\"${ip}\"," ./public/js/client.mjs
 rm ./tmp-ip.txt
-head -2 ./public/js/client.mjs
+head ./public/js/client.mjs | grep "var myHostname" 
