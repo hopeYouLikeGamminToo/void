@@ -145,8 +145,7 @@ function collisionDetect(character, object) {
 function addOnlinePlayer() {
     // create player
     try {
-        let thisUsername = Object.keys(state.onlinePlayers)[state.playerCount - 1];
-        player2 = state.onlinePlayers[thisUsername] = new MultiAnimatedSprite(app.loader.resources.kraken.spritesheet); 
+        player2 = new MultiAnimatedSprite(app.loader.resources.kraken.spritesheet); 
         app.stage.addChild(player2);
     } catch(err) { 
         console.log("ERROR ADDING ONLINE PLAYER: ", err);
@@ -159,7 +158,17 @@ function gameLoop() {
     if (Object.keys(state.onlinePlayers).length > state.playerCount) {
         console.log("Another player joined the match!");
         state.playerCount += 1;
-        // addOnlinePlayer();
+        addOnlinePlayer();
+    }
+    if (state.playerCount > 1) {
+        if (Object.keys(state.onlinePlayers)[0] === username) {
+            var thisUsername = Object.keys(state.onlinePlayers)[1];
+        } else {
+            var thisUsername = Object.keys(state.onlinePlayers)[0];
+        }
+        player2.x = state.onlinePlayers[thisUsername].x
+        player2.y = state.onlinePlayers[thisUsername].y
+        player2.setAnimation(state.onlinePlayers[thisUsername].animation)
     }
     // user input + positional console.logic
     if (input_type == "gamepad") {
@@ -273,6 +282,7 @@ function gameLoop() {
         "character": character,
         "x": state.player.x, 
         "y": state.player.y,
+        "animation": state.player.currentAnimation,
         "playerCount": state.playerCount  
     }
     sendToServer(msg);

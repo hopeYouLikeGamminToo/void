@@ -172,6 +172,7 @@ function connect() {
                                 "character": msg.character,
                                 "x": msg.x,
                                 "y": msg.y,
+                                "animation": msg.animation,
                                 "playerCount": msg.playerCount
                     }
                 } catch {
