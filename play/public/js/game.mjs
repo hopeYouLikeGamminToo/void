@@ -1,27 +1,11 @@
+// imports
 import * as PIXI from "./pixi.mjs";
 import { username, clientID, sendToServer, log} from "./client.mjs";
 
+// npm install stats
 var stats = new Stats();
 stats.showPanel( 0 ); // 0: fps, 1: ms, 2: mb, 3+: custom
 document.body.appendChild( stats.dom );
-
-// MultiAnimatedSprite needs extends to load spritesheet
-"use strict";
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        if (typeof b !== "function" && b !== null)
-            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 
 // Use the native window resolution as the default resolution
 // will support high-density displays when rendering
@@ -42,36 +26,7 @@ var app = new PIXI.Application({
 
 document.body.appendChild(app.view);
 
-var MultiAnimatedSprite = /** @class */ (function (_super) {
-    __extends(MultiAnimatedSprite, _super);
-    function MultiAnimatedSprite(spritesheet) {
-        var _this = _super.call(this) || this;
-        _this.spritesheet = spritesheet;
-        console.log("spritesheet: ", spritesheet);
-        _this.scale.x = _this.scale.y = 1;
-        var defaultAnimation = Object.keys(spritesheet.animations)[0];
-        _this.setAnimation(defaultAnimation);
-        return _this;
-    }
-    MultiAnimatedSprite.prototype.setAnimation = function (name) {
-        if (this.currentAnimation === name)
-            return;
-
-        var textures = this.spritesheet.animations[name];
-        if (!this.sprite) {
-            this.sprite = new PIXI.AnimatedSprite(textures);
-            this.addChild(this.sprite);
-        }
-        else {
-            this.sprite.textures = textures;
-        }
-        this.sprite.animationSpeed = 0.22;
-        this.sprite.play();
-        this.currentAnimation = name;
-    };
-    return MultiAnimatedSprite;
-}(PIXI.Container));
-
+//game state - add anything relevant here for future use/manipulation
 var state = {
     keys: {},
     player: null,
@@ -95,215 +50,6 @@ var gravity = 7;
 var jumpSpeed = 10;
 var playerSpeed = 5;
 var bullets = [];
-
-function collisionDetect(character, object) {
-    //Define the variables we'll need to calculate
-    let hit, combinedHalfWidths, combinedHalfHeights, vx, vy;
-
-    //hit will determine whether there's a collision
-    hit = false;
-
-    //Find the center points of each sprite
-    character.centerX = character.x + character.width / 2;
-    character.centerY = character.y + character.height / 2 - 20; // -20 to make character overlap platform a bit
-    object.centerX = object.x + object.width / 2;
-    object.centerY = object.y + object.height / 2;
-
-    //Find the half-widths and half-heights of each sprite
-    character.halfWidth = character.width / 2;
-    character.halfHeight = character.height / 2;
-    object.halfWidth = object.width / 2;
-    object.halfHeight = object.height / 2;
-
-    //Calculate the distance vector between the sprites
-    vx = character.centerX - object.centerX;
-    vy = character.centerY - object.centerY;
-
-    //Figure out the combined half-widths and half-heights
-    combinedHalfWidths = character.halfWidth + object.halfWidth;
-    combinedHalfHeights = character.halfHeight + object.halfHeight;
-
-    //Check for a collision on the x axis
-    if (Math.abs(vx) < combinedHalfWidths) {
-        //A collision might be occurring. Check for a collision on the y axis
-        if (Math.abs(vy) < combinedHalfHeights) {
-            //There's definitely a collision happening
-            hit = true;
-        } else {
-            //There's no collision on the y axis
-            hit = false;
-        }
-    } else {
-        //There's no collision on the x axis
-        hit = false;
-    }
-
-    //`hit` will be either `true` or `false`
-    return hit;
-};
-
-function addOnlinePlayer() {
-    // create player
-    try {
-        player2 = new MultiAnimatedSprite(app.loader.resources.kraken.spritesheet); 
-        app.stage.addChild(player2);
-    } catch(err) { 
-        console.log("ERROR ADDING ONLINE PLAYER: ", err);
-    }
-}
-
-function gameLoop() {
-    stats.begin();
-    console.log("online player count: ", Object.keys(state.onlinePlayers).length);
-    if (Object.keys(state.onlinePlayers).length > state.playerCount) {
-        console.log("Another player joined the match!");
-        state.playerCount += 1;
-        addOnlinePlayer();
-    }
-    if (state.playerCount > 1) {
-        if (Object.keys(state.onlinePlayers)[0] === username) {
-            var thisUsername = Object.keys(state.onlinePlayers)[1];
-        } else {
-            var thisUsername = Object.keys(state.onlinePlayers)[0];
-        }
-        player2.x = state.onlinePlayers[thisUsername].x
-        player2.y = state.onlinePlayers[thisUsername].y
-        player2.setAnimation(state.onlinePlayers[thisUsername].animation)
-    }
-    // user input + positional console.logic
-    if (input_type == "gamepad") {
-        var gamepads = navigator.getGamepads();
-        if (gamepads[0].buttons.some((elem) => elem.pressed == 1) || gamepads[0].axes.some((elem) => elem >= 0.2) || gamepads[0].axes.some((elem) => elem <= -0.2)) {
-            console.log(gamepads[0]);
-        }
-        if (gamepads[0].buttons[7].value) {
-            state.player.setAnimation('Shoot');
-            console.log("shoot!");
-            var direction = new PIXI.Point();
-            direction.x = mouse.x - player.x;
-            direction.y = mouse.y - player.y - 526;
-
-            //Normalize
-            let length = Math.sqrt(direction.x * direction.x + direction.y * direction.y);
-            direction.x /= length;
-            direction.y /= length;
-
-            let bullet = new PIXI.Sprite(app.loader.resources.bullet.texture);
-            bullet.x = state.player.x + 140; // 155; // spaceman
-            bullet.y = state.player.y + 115; // 130; // spaceman
-            console.log("bullet direction: ", direction);
-            bullet.direction = direction;
-            bullets.push(bullet);
-            app.stage.addChild(bullet);
-
-            // let bullet = new PIXI.Sprite(app.loader.resources.bullet.texture);
-            // // should read arm offsets from character json sprite sheet file here
-            // bullet.x = state.player.x + 140; // 155; // spaceman
-            // bullet.y = state.player.y + 115; // 130; // spaceman
-            // app.stage.addChild(bullet);
-            // bullets.push(bullet);
-            // delete state.keys["click"];
-        } else if (gamepads[0].buttons[3].value || gamepads[0].axes[1] < -0.50) {
-            state.player.setAnimation('Jump');
-            state.player.y -= playerSpeed + jumpSpeed;
-            console.log("jump!");
-            if (gamepads[0].axes[0] < -0.10) {
-                state.player.x -= playerSpeed;
-            } else if (gamepads[0].axes[0] > 0.10) {
-                state.player.x += playerSpeed;
-            } 
-        } else if (gamepads[0].axes[0] < -0.10) {
-            state.player.setAnimation('RunLeft');
-            state.player.x -= playerSpeed * -1 * gamepads[0].axes[0];
-            console.log("run left!");
-        } else if (gamepads[0].axes[0] > 0.10) {
-            state.player.setAnimation('RunRight');
-            state.player.x += playerSpeed * gamepads[0].axes[0];
-            console.log("run right!");
-        } else if (gamepads[0].axes[1] > 0.50) {
-            // if touching platform > duck, else accelerate
-            state.player.setAnimation('Duck');
-            // state.player.y += playerSpeed;
-            console.log("duck!");
-        } else {
-            state.player.setAnimation('Idle');
-        }
-    }
-    if (input_type == "keyboard") { // keyboard
-        if (state.keys['click']) {
-            state.player.setAnimation('Shoot');
-            console.log("shoot!");
-        } else if (state.keys['Space']) {
-            // state.player.setAnimation('Jump');
-            console.log("space!");
-        } else if (state.keys["KeyW"]) {
-            state.player.setAnimation('Jump');
-            state.player.y -= playerSpeed + jumpSpeed; // jump speed
-            console.log("jump!");
-            if (state.keys["KeyA"]) {
-                state.player.x -= playerSpeed;
-            } else if (state.keys["KeyD"]) {
-                state.player.x += playerSpeed;
-            } 
-        } else if (state.keys["KeyA"]) {
-            state.player.setAnimation('RunLeft');
-            state.player.x -= playerSpeed;
-            console.log("run left!");
-        } else if (state.keys["KeyD"]) {
-            state.player.setAnimation('RunRight');
-            state.player.x += playerSpeed;
-            console.log("run right!");
-        } else if (state.keys["KeyS"]) {
-            // if touching platform > duck, else accelerate
-            state.player.setAnimation('Duck');
-            // state.player.y += playerSpeed;
-            console.log("duck!");
-        } else {
-            state.player.setAnimation('Idle');
-        }
-    }
-    updateBullets();
-
-    //detect collisions
-    let collision = collisionDetect(player, rectangle1) || collisionDetect(player, rectangle2) || collisionDetect(player, roundBox);
-    if (collision) {
-        // console.log("collision detected!");
-    } else {
-        state.player.y += gravity;
-    }
-
-    //resolve collisions
-
-    // share game state with signaling server & thus other connected clients
-    var ts = Date.now();
-    var msg = {
-        "ts": ts,
-        "username": username,
-        "character": character,
-        "x": state.player.x, 
-        "y": state.player.y,
-        "animation": state.player.currentAnimation,
-        "playerCount": state.playerCount  
-    }
-    sendToServer(msg);
-
-    stats.end();
-
-}
-
-function updateBullets() {
-    let speed = 15;
-    for (let i = 0; i < bullets.length; i++) {
-        let bullet = bullets[i];
-        bullet.x += bullet.direction.x * speed;
-        bullet.y += bullet.direction.y * speed;
-        //Hit detection here
-        if (bullet.y < 0) {
-            app.stage.removeChild(bullet);
-            bullets.splice(i, 1);
-        }
-    }
-}
 
 // preload assets
 app.loader.baseUrl = 'assets';
@@ -339,6 +85,57 @@ roundBox.x = app.screen.width / 4;
 roundBox.y = app.screen.height / 1.3;
 app.stage.addChild(roundBox);
 
+
+// MultiAnimatedSprite needs extends to load spritesheet
+"use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+
+// create multi - PIXI.AnimatedSprite (spritesheet)
+var MultiAnimatedSprite = /** @class */ (function (_super) {
+    __extends(MultiAnimatedSprite, _super);
+    function MultiAnimatedSprite(spritesheet) {
+        var _this = _super.call(this) || this;
+        _this.spritesheet = spritesheet;
+        console.log("spritesheet: ", spritesheet);
+        _this.scale.x = _this.scale.y = 1;
+        var defaultAnimation = Object.keys(spritesheet.animations)[0];
+        _this.setAnimation(defaultAnimation);
+        return _this;
+    }
+    MultiAnimatedSprite.prototype.setAnimation = function (name) {
+        if (this.currentAnimation === name)
+            return;
+
+        var textures = this.spritesheet.animations[name];
+        if (!this.sprite) {
+            this.sprite = new PIXI.AnimatedSprite(textures);
+            this.addChild(this.sprite);
+        }
+        else {
+            this.sprite.textures = textures;
+        }
+        this.sprite.animationSpeed = 0.22;
+        this.sprite.play();
+        this.currentAnimation = name;
+    };
+    return MultiAnimatedSprite;
+}(PIXI.Container));
+
+
 function setup(loader, resources) {
     console.log(resources);
 
@@ -361,9 +158,52 @@ function setup(loader, resources) {
 
     app.stage.addChild(state.player);
 
+    // can move this function to start of program
     configureInputHandlers();
 
     app.ticker.add(gameLoop);
+}
+
+// this may get called more than is needed > by client.mjs
+function addPlayer(){
+    console.log("adding ", username, " to stage!");
+
+    if ("kraken" in app.loader.resources) {
+        character = "spaceman";
+    } else {
+        character = "kraken";
+    }
+
+    app.loader
+        .use(function (resource, next) {
+            if (resource.extension === 'json' && resource.data.meta.app === 'http://www.aseprite.org/') {
+                for (var _i = 0, _a = resource.data.meta.frameTags; _i < _a.length; _i++) {
+                    var tag = _a[_i];
+                    var frames = [];
+                    for (var i = tag.from; i < tag.to; i++) {
+                        frames.push({ texture: resource.textures[i], time: resource.data.frames[i].duration });
+                    }
+                    if (tag.direction === 'pingpong') {
+                        for (var i = tag.to; i >= tag.from; i--) {
+                            frames.push({ texture: resource.textures[i], time: resource.data.frames[i].duration });
+                        }
+                    }
+                    resource.spritesheet.animations[tag.name] = frames;
+                }
+            }
+            next();
+        })
+        .add(character, character + ".json").load(setup);
+}
+
+function addOnlinePlayer() {
+    // create player
+    try {
+        player2 = new MultiAnimatedSprite(app.loader.resources.kraken.spritesheet); 
+        app.stage.addChild(player2);
+    } catch(err) { 
+        console.log("ERROR ADDING ONLINE PLAYER: ", err);
+    }
 }
 
 function configureInputHandlers() {
@@ -426,35 +266,205 @@ function configureInputHandlers() {
     });
 }
 
-function addPlayer(){
-    console.log("adding ", username, " to stage!");
+function collisionDetect(character, object) {
+    //Define the variables we'll need to calculate
+    let hit, combinedHalfWidths, combinedHalfHeights, vx, vy;
 
-    if ("kraken" in app.loader.resources) {
-        character = "spaceman";
+    //hit will determine whether there's a collision
+    hit = false;
+
+    //Find the center points of each sprite
+    character.centerX = character.x + character.width / 2;
+    character.centerY = character.y + character.height / 2 - 20; // -20 to make character overlap platform a bit
+    object.centerX = object.x + object.width / 2;
+    object.centerY = object.y + object.height / 2;
+
+    //Find the half-widths and half-heights of each sprite
+    character.halfWidth = character.width / 2;
+    character.halfHeight = character.height / 2;
+    object.halfWidth = object.width / 2;
+    object.halfHeight = object.height / 2;
+
+    //Calculate the distance vector between the sprites
+    vx = character.centerX - object.centerX;
+    vy = character.centerY - object.centerY;
+
+    //Figure out the combined half-widths and half-heights
+    combinedHalfWidths = character.halfWidth + object.halfWidth;
+    combinedHalfHeights = character.halfHeight + object.halfHeight;
+
+    //Check for a collision on the x axis
+    if (Math.abs(vx) < combinedHalfWidths) {
+        //A collision might be occurring. Check for a collision on the y axis
+        if (Math.abs(vy) < combinedHalfHeights) {
+            //There's definitely a collision happening
+            hit = true;
+        } else {
+            //There's no collision on the y axis
+            hit = false;
+        }
     } else {
-        character = "kraken";
+        //There's no collision on the x axis
+        hit = false;
     }
 
-    app.loader
-        .use(function (resource, next) {
-            if (resource.extension === 'json' && resource.data.meta.app === 'http://www.aseprite.org/') {
-                for (var _i = 0, _a = resource.data.meta.frameTags; _i < _a.length; _i++) {
-                    var tag = _a[_i];
-                    var frames = [];
-                    for (var i = tag.from; i < tag.to; i++) {
-                        frames.push({ texture: resource.textures[i], time: resource.data.frames[i].duration });
-                    }
-                    if (tag.direction === 'pingpong') {
-                        for (var i = tag.to; i >= tag.from; i--) {
-                            frames.push({ texture: resource.textures[i], time: resource.data.frames[i].duration });
-                        }
-                    }
-                    resource.spritesheet.animations[tag.name] = frames;
-                }
-            }
-            next();
-        })
-        .add(character, character + ".json").load(setup);
+    //`hit` will be either `true` or `false`
+    return hit;
+};
+
+// while True equivalent
+function gameLoop() {
+    stats.begin();
+
+    console.log("online player count: ", Object.keys(state.onlinePlayers).length);
+    if (Object.keys(state.onlinePlayers).length > state.playerCount) {
+        console.log("Another player joined the match!");
+        state.playerCount += 1;
+        addOnlinePlayer();
+    }
+
+    if (state.playerCount > 1) {
+        if (Object.keys(state.onlinePlayers)[0] === username) {
+            var thisUsername = Object.keys(state.onlinePlayers)[1];
+        } else {
+            var thisUsername = Object.keys(state.onlinePlayers)[0];
+        }
+        player2.x = state.onlinePlayers[thisUsername].x
+        player2.y = state.onlinePlayers[thisUsername].y
+        player2.setAnimation(state.onlinePlayers[thisUsername].animation)
+    }
+
+    // user input + positional logic
+    if (input_type == "gamepad") {
+        var gamepads = navigator.getGamepads();
+        if (gamepads[0].buttons.some((elem) => elem.pressed == 1) || gamepads[0].axes.some((elem) => elem >= 0.2) || gamepads[0].axes.some((elem) => elem <= -0.2)) {
+            console.log(gamepads[0]);
+        }
+        
+        if (gamepads[0].buttons[7].value) {
+            state.player.setAnimation('Shoot');
+            console.log("shoot!");
+
+            // where bullet is going to go
+            var direction = new PIXI.Point();
+            direction.x = mouse.x - player.x;
+            direction.y = mouse.y - player.y - 526;
+
+            //Normalize
+            let length = Math.sqrt(direction.x * direction.x + direction.y * direction.y);
+            direction.x /= length;
+            direction.y /= length;
+
+            // create bullet & send in certain direction
+            let bullet = new PIXI.Sprite(app.loader.resources.bullet.texture);
+            bullet.x = state.player.x + 140; // 155; // spaceman
+            bullet.y = state.player.y + 115; // 130; // spaceman
+            console.log("bullet direction: ", direction);
+            bullet.direction = direction;
+            bullets.push(bullet);
+            app.stage.addChild(bullet);
+
+        } else if (gamepads[0].buttons[3].value || gamepads[0].axes[1] < -0.50) {
+            state.player.setAnimation('Jump');
+            state.player.y -= playerSpeed + jumpSpeed;
+            console.log("jump!");
+            if (gamepads[0].axes[0] < -0.10) {
+                state.player.x -= playerSpeed;
+            } else if (gamepads[0].axes[0] > 0.10) {
+                state.player.x += playerSpeed;
+            } 
+        } else if (gamepads[0].axes[0] < -0.10) {
+            state.player.setAnimation('RunLeft');
+            state.player.x -= playerSpeed * -1 * gamepads[0].axes[0];
+            console.log("run left!");
+        } else if (gamepads[0].axes[0] > 0.10) {
+            state.player.setAnimation('RunRight');
+            state.player.x += playerSpeed * gamepads[0].axes[0];
+            console.log("run right!");
+        } else if (gamepads[0].axes[1] > 0.50) {
+            // if touching platform > duck, else accelerate
+            state.player.setAnimation('Duck');
+            // state.player.y += playerSpeed;
+            console.log("duck!");
+        } else {
+            state.player.setAnimation('Idle');
+        }
+    }
+    if (input_type == "keyboard") { // keyboard
+        if (state.keys['click']) {
+            state.player.setAnimation('Shoot');
+            console.log("shoot!");
+        } else if (state.keys['Space']) {
+            // state.player.setAnimation('Jump');
+            console.log("space!");
+        } else if (state.keys["KeyW"]) {
+            state.player.setAnimation('Jump');
+            state.player.y -= playerSpeed + jumpSpeed; // jump speed
+            console.log("jump!");
+            if (state.keys["KeyA"]) {
+                state.player.x -= playerSpeed;
+            } else if (state.keys["KeyD"]) {
+                state.player.x += playerSpeed;
+            } 
+        } else if (state.keys["KeyA"]) {
+            state.player.setAnimation('RunLeft');
+            state.player.x -= playerSpeed;
+            console.log("run left!");
+        } else if (state.keys["KeyD"]) {
+            state.player.setAnimation('RunRight');
+            state.player.x += playerSpeed;
+            console.log("run right!");
+        } else if (state.keys["KeyS"]) {
+            // if touching platform > duck, else accelerate
+            state.player.setAnimation('Duck');
+            // state.player.y += playerSpeed;
+            console.log("duck!");
+        } else {
+            state.player.setAnimation('Idle');
+        }
+    }
+
+    updateBullets();
+
+    //detect collisions
+    let collision = collisionDetect(player, rectangle1) || collisionDetect(player, rectangle2) || collisionDetect(player, roundBox);
+    if (collision) {
+        // console.log("collision detected!");
+    } else {
+        state.player.y += gravity;
+    }
+
+    // share game state with signaling server & thus other connected clients
+    var ts = Date.now();
+    var msg = {
+        "ts": ts,
+        "username": username,
+        "character": character,
+        "x": state.player.x, 
+        "y": state.player.y,
+        "animation": state.player.currentAnimation,
+        "playerCount": state.playerCount  
+    }
+    sendToServer(msg);
+
+    stats.end();
+
+}
+
+function updateBullets() {
+    let speed = 15;
+    for (let i = 0; i < bullets.length; i++) {
+        let bullet = bullets[i];
+        bullet.x += bullet.direction.x * speed;
+        bullet.y += bullet.direction.y * speed;
+        
+        //Hit detection here
+
+        if (bullet.y < 0) {
+            app.stage.removeChild(bullet);
+            bullets.splice(i, 1);
+        }
+    }
 }
 
 export {addPlayer, state};
