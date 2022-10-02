@@ -1,6 +1,6 @@
 @font-face {
     font-family: 'Pixelated';
-    src: url('../font/consolas.ttf');
+    src: url('../font/arcade-classic.ttf');
 }
 
 #useFont {
@@ -11,7 +11,8 @@
 input,
 select,
 textarea,
-button {
+button
+body {
     font-family: inherit;
 }
 
