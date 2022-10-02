@@ -13,24 +13,29 @@ var app = new Application({
     resolution: devicePixelRatio,
     width: window.outerWidth,
     height: window.outerHeight,
-    backgroundColor: 0xFFFFFF,
+    backgroundColor: 0x000000,
     autoDensity: true
 });
 
 document.body.appendChild(app.view);
 
 const chatInput = document.getElementById("chatInput");
-chatInput.style.border = "gray";
 chatInput.style.fontFamily = 'space';
-chatInput.style.color = "purple";
-chatInput.style.backgroundColor = "gray";
-chatInput.style.display = 'none'; // block = show; none = hidden
+chatInput.style.color = "#6F5FCA";
+chatInput.style.border = "gray";
+chatInput.style.backgroundColor = "black";
+chatInput.style.outlineColor = "black";
+chatInput.style.pointerEvents = "none";
+chatInput.style.padding = "0px";
+chatInput.style.margin = "0px";
+chatInput.style.lineHeight = "0px";
+// chatInput.style.display = 'none'; // block = show; none = hidden
 
 // create wrapped element
 let wrappedElement = new ElementWrapper(chatInput);
 
 wrappedElement.x = 25;
-wrappedElement.y = 200;
+wrappedElement.y = 240;
 
 app.stage.addChild(wrappedElement);
 
@@ -60,11 +65,11 @@ let previousMessageY;
 let chatMessages = [];
 
 document.body.onkeydown = function (e) {
-	console.log("onkeydown: ", e.code);
+	// console.log("onkeydown: ", e.code);
 	keys[e.code] = true;
 };
 document.body.onkeyup = function (e) {
-	console.log("onkeyup: ", e.code);
+	// console.log("onkeyup: ", e.code);
 
 	if (e.code == "Enter") {
 		if (enter_cnt == 0) {
@@ -80,36 +85,43 @@ document.body.onkeyup = function (e) {
 			const style = new TextStyle({
 				fontFamily: "space",
 				fontSize: 12,
-				fill: "white",
-				stroke: "#6F5FCA",
-				strokeThickness: 4,
-				dropShadow: true,
-				dropShadowColor: "#000000",
-				dropShadowBlur: 4,
+				fill: "#6F5FCA",
+				// stroke: "#6F5FCA",
+				// strokeThickness: 4,
+				// dropShadow: true,
+				// dropShadowColor: "#000000",
+				// dropShadowBlur: 4,
 				dropShadowAngle: Math.PI / 6,
 				dropShadowDistance: 6,
 			  });
 			
 			const message = new Text(inputMessage, style);
-			chatMessages.push(message);
-			app.stage.addChild(message);
+			console.log("message: ", inputMessage);
+			if (inputMessage != ""){
+				chatMessages.push(message);
+				app.stage.addChild(message);
 
-			if (first_enter) {
-				message.y = wrappedElement.y - 100;
-				previousMessageY = message.y
+				if (first_enter) {
+					message.y = wrappedElement.y - 200;
+					previousMessageY = message.y
+					console.log("message.y: ", message.y);
+					first_enter = false;
+				}
+	
+				message.x = 25;
+				message.y = previousMessageY + 20;
+				previousMessageY = message.y;
 				console.log("message.y: ", message.y);
-				first_enter = false;
-			}
-
-			message.x = 25;
-			message.y = previousMessageY + 20;
-			previousMessageY = message.y;
-			console.log("message.y: ", message.y);
-			console.log("app.stage.children: ", app.stage.children);
-			console.log(app.stage.children)
-			if (message.y == wrappedElement.y + 20) {
-				app.stage.removeChild(chatMessages[0]);
-				chatMessages.shift();
+				if (message.y >= wrappedElement.y - 20) {
+					app.stage.removeChild(chatMessages[0]);
+					previousMessageY -= 20;
+					app.renderer.render(app.stage);
+					chatMessages.shift();
+					console.log("chatMessages: ", chatMessages)
+					for (var i = 0; i < chatMessages.length; i++) {
+						chatMessages[i].y -= 20;
+					}
+				}
 			}
 
 			enter_cnt = -1;

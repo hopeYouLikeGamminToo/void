@@ -5,5 +5,14 @@
 
 #useFont {
     font-family: 'space';
-    font-size: 12px;
+    font-size: 6px;
+}
+
+body {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    padding: 0;
+    margin: 0;
+    overflow: hidden;
 }
