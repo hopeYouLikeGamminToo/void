@@ -28,3 +28,6 @@
 [submodule "submodules/stats"]
 	path = submodules/stats
 	url = https://github.com/mrdoob/stats.js.git
+[submodule "submodules/pixi-html-element-wrapper"]
+	path = submodules/pixi-html-element-wrapper
+	url = https://github.com/EneaEntertainment/pixi-html-element-wrapper.git

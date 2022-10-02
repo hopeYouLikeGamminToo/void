@@ -1,0 +1,9 @@
+@font-face {
+    font-family: 'space';
+    src: url('font/space.ttf');
+}
+
+#useFont {
+    font-family: 'space';
+    font-size: 12px;
+}
