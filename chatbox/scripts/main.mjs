@@ -25,11 +25,20 @@ chatInput.style.color = "#6F5FCA";
 chatInput.style.border = "gray";
 chatInput.style.backgroundColor = "black";
 chatInput.style.outlineColor = "black";
+// chatInput.style.outlineWidth = "0px";
+// chatInput.style.outlineStyle = "none";
+chatInput.style.outlineOffset = "0px";
+chatInput.style.overflow = "hidden";	
 chatInput.style.pointerEvents = "none";
 chatInput.style.padding = "0px";
 chatInput.style.margin = "0px";
 chatInput.style.lineHeight = "0px";
-// chatInput.style.display = 'none'; // block = show; none = hidden
+chatInput.style.appearance = "none";
+chatInput.style.whiteSpace = "nowrap";
+chatInput.style.position = "absolute"; 
+// move input form off screen > wrapped element will be in canvas
+chatInput.style.left= "-999em";
+chatInput.style.display = 'none'; // block = show; none = hidden
 
 // create wrapped element
 let wrappedElement = new ElementWrapper(chatInput);
@@ -63,6 +72,7 @@ let enter_cnt = 0;
 let first_enter = true;
 let previousMessageY;
 let chatMessages = [];
+let messageStepSize = 20;
 
 document.body.onkeydown = function (e) {
 	// console.log("onkeydown: ", e.code);
@@ -73,11 +83,13 @@ document.body.onkeyup = function (e) {
 
 	if (e.code == "Enter") {
 		if (enter_cnt == 0) {
-			chatInput.style.display = 'block';
+			chatInput.style.display = "block";
 			chatInput.focus();
 		}
 		if (enter_cnt == 1) {
-			chatInput.style.display = 'none';
+			chatInput.style.display = "none"; // leave this in for now > may help with performance if display is removed
+			// blur removes focus > not needed if we set display to none, but leaving for now...
+			chatInput.blur();
 			chatInput.submit;
 			var inputMessage = chatInput.value;
 			chatInput.value = "";
@@ -86,17 +98,20 @@ document.body.onkeyup = function (e) {
 				fontFamily: "space",
 				fontSize: 12,
 				fill: "#6F5FCA",
+				wordWrap: true,
+				wordWrapWidth: 300,
 				// stroke: "#6F5FCA",
 				// strokeThickness: 4,
 				// dropShadow: true,
 				// dropShadowColor: "#000000",
 				// dropShadowBlur: 4,
-				dropShadowAngle: Math.PI / 6,
-				dropShadowDistance: 6,
+				// dropShadowAngle: Math.PI / 6,
+				// dropShadowDistance: 6,
 			  });
 			
 			const message = new Text(inputMessage, style);
-			console.log("message: ", inputMessage);
+			console.log("inputMessage: ", inputMessage);
+			
 			if (inputMessage != ""){
 				chatMessages.push(message);
 				app.stage.addChild(message);
@@ -109,17 +124,19 @@ document.body.onkeyup = function (e) {
 				}
 	
 				message.x = 25;
-				message.y = previousMessageY + 20;
+				console.log(message.width);
+				message.y = previousMessageY + (messageStepSize * Math.ceil(message.width / 300));
 				previousMessageY = message.y;
-				console.log("message.y: ", message.y);
-				if (message.y >= wrappedElement.y - 20) {
+				console.log("message.y: ", message.y, ", previousMessageY: ", previousMessageY);
+
+				if (message.y >= wrappedElement.y - messageStepSize) {
 					app.stage.removeChild(chatMessages[0]);
-					previousMessageY -= 20;
+					previousMessageY -= messageStepSize;
 					app.renderer.render(app.stage);
 					chatMessages.shift();
 					console.log("chatMessages: ", chatMessages)
 					for (var i = 0; i < chatMessages.length; i++) {
-						chatMessages[i].y -= 20;
+						chatMessages[i].y -= messageStepSize;
 					}
 				}
 			}
