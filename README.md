@@ -1,3 +1,5 @@
+<img src="./play/assets//void.png">
+
 ### First Time Setup
 >execute startup shell script: ./play/startup.sh<br/>
 >OR<br/>

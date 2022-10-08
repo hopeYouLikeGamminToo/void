@@ -1,6 +1,11 @@
 import { Application, Container, Loader, SCALE_MODES, Sprite, settings, Text, TextStyle} from './pixi.mjs';
 import ElementWrapper from './element-wrapper.mjs';
 
+console.log("chatbox sandbox > building sand castles");
+console.log("press enter to input username")
+console.log("press space to switch scenes")
+console.log("press enter to message chat")
+
 settings.RESOLUTION = window.devicePixelRatio;
 settings.SCALE_MODE = SCALE_MODES.NEAREST;
 
@@ -8,8 +13,8 @@ let startupScene;
 let gameScene;
 let gameOverScene;
 
+let title;
 let triangle;
-let square;
 
 var app = new Application({
     // options
@@ -108,38 +113,38 @@ app.stage.addChild(wrappedUsername);
 ******************************/
 
 Loader.shared
+		.add(['images/void.png'])
 		.add(['images/triangle.jpeg'])
-		.add(['images/square.png'])
 		.load(setup);
 
 function setup() {
+	title = new Sprite(
+		Loader.shared.resources['images/void.png'].texture
+	);
+
 	triangle = new Sprite(
 		Loader.shared.resources['images/triangle.jpeg'].texture
 	);
 
-	square = new Sprite(
-		Loader.shared.resources['images/square.png'].texture
-	);
+	// title.position.set(300, 300);
+	title.x = window.innerWidth / 2.5;
+	title.y = window.innerHeight /  3;
+	title.width = 200;
+	title.height = 200;
 
-	// triangle.position.set(300, 300);
+	// title.position.set(300, 300);
 	triangle.x = window.innerWidth / 2.5;
 	triangle.y = window.innerHeight /  3;
 	triangle.width = 200;
 	triangle.height = 200;
 
-	// triangle.position.set(300, 300);
-	square.x = window.innerWidth / 2.5;
-	square.y = window.innerHeight /  3;
-	square.width = 200;
-	square.height = 200;
-
-	// Add the triangle to the stage
-	// app.stage.addChild(triangle);
+	// Add the title to the stage
+	// app.stage.addChild(title);
 
 	startupScene = new Container();
 	app.stage.addChild(startupScene);
 	startupScene.visible = true;
-	startupScene.addChild(triangle)
+	startupScene.addChild(title)
 
 	gameScene = new Container();
 	app.stage.addChild(gameScene);
@@ -170,9 +175,9 @@ document.body.onkeyup = function (e) {
 		app.stage.removeChild(usernameLabel);
 		startupScene.removeChild(wrappedUsername);
 		username.style.display = "none";
-		startupScene.removeChild(triangle);
+		startupScene.removeChild(title);
 		startupScene.visible = false;
-		gameScene.addChild(square)
+		gameScene.addChild(triangle)
 		gameScene.visible = true;
 	}
 
