@@ -1,10 +1,15 @@
-import { Application, Loader, SCALE_MODES, Sprite, settings, Text, TextStyle} from './pixi.mjs';
-
-import canvasBounds from './canvas-bounds.mjs';
+import { Application, Container, Loader, SCALE_MODES, Sprite, settings, Text, TextStyle} from './pixi.mjs';
 import ElementWrapper from './element-wrapper.mjs';
 
 settings.RESOLUTION = window.devicePixelRatio;
 settings.SCALE_MODE = SCALE_MODES.NEAREST;
+
+let startupScene;
+let gameScene;
+let gameOverScene;
+
+let triangle;
+let square;
 
 var app = new Application({
     // options
@@ -19,6 +24,9 @@ var app = new Application({
 
 document.body.appendChild(app.view);
 
+/****************************
+	MOVE TO SETUP FXN
+******************************/
 const chatInput = document.getElementById("chatInput");
 chatInput.style.fontFamily = 'space';
 chatInput.style.color = "#6F5FCA";
@@ -40,19 +48,77 @@ chatInput.style.position = "absolute";
 chatInput.style.left= "-999em";
 chatInput.style.display = 'none'; // block = show; none = hidden
 
+const username = document.getElementById("username");
+username.style.fontFamily = 'space';
+username.style.color = "#6F5FCA";
+username.style.border = "gray";
+username.style.backgroundColor = "white";
+username.style.outlineColor = "white";
+// username.style.outlineWidth = "0px";
+// username.style.outlineStyle = "none";
+username.style.outlineOffset = "0px";
+username.style.overflow = "hidden";	
+username.style.pointerEvents = "none";
+username.style.padding = "0px";
+username.style.margin = "0px";
+username.style.lineHeight = "0px";
+username.style.appearance = "none";
+username.style.whiteSpace = "nowrap";
+username.style.position = "absolute"; 
+// move input form off screen > wrapped element will be in canvas
+username.style.left= "-999em";
+username.style.display = 'block'; // block = show; none = hidden
+
+const labelStyle = new TextStyle({
+	fontFamily: "space",
+	fontSize: 16,
+	fill: "#6F5FCA",
+	wordWrap: true,
+	wordWrapWidth: 300,
+	stroke: "#860000",
+	strokeThickness: 1,
+	// dropShadow: true,
+	// dropShadowColor: "#000000",
+	// dropShadowBlur: 4,
+	// dropShadowAngle: Math.PI / 6,
+	// dropShadowDistance: 6,
+  });
+
+let usernameLabel = new Text("USERNAME", labelStyle);
+usernameLabel.x = 100;
+usernameLabel.y = 80;
+app.stage.addChild(usernameLabel);
+
 // create wrapped element
-let wrappedElement = new ElementWrapper(chatInput);
+let wrappedChatInput = new ElementWrapper(chatInput);
+let wrappedUsername = new ElementWrapper(username);
 
-wrappedElement.x = 25;
-wrappedElement.y = 240;
+wrappedChatInput.x = 25;
+wrappedChatInput.y = 240;
 
-app.stage.addChild(wrappedElement);
+wrappedUsername.x = 100;
+wrappedUsername.y = 100;
 
-Loader.shared.add(['images/triangle.png']).load(setup);
+// wait to add chatInput to scene
+app.stage.addChild(wrappedChatInput);
+app.stage.addChild(wrappedUsername);
+
+/****************************
+	END OF MOVE TO SETUP FXN > (everything that gets added to stage > add to proper stage plz)
+******************************/
+
+Loader.shared
+		.add(['images/triangle.jpeg'])
+		.add(['images/square.png'])
+		.load(setup);
 
 function setup() {
-	const triangle = new Sprite(
-		Loader.shared.resources['images/triangle.png'].texture
+	triangle = new Sprite(
+		Loader.shared.resources['images/triangle.jpeg'].texture
+	);
+
+	square = new Sprite(
+		Loader.shared.resources['images/square.png'].texture
 	);
 
 	// triangle.position.set(300, 300);
@@ -61,8 +127,27 @@ function setup() {
 	triangle.width = 200;
 	triangle.height = 200;
 
+	// triangle.position.set(300, 300);
+	square.x = window.innerWidth / 2.5;
+	square.y = window.innerHeight /  3;
+	square.width = 200;
+	square.height = 200;
+
 	// Add the triangle to the stage
-	app.stage.addChild(triangle);
+	// app.stage.addChild(triangle);
+
+	startupScene = new Container();
+	app.stage.addChild(startupScene);
+	startupScene.visible = true;
+	startupScene.addChild(triangle)
+
+	gameScene = new Container();
+	app.stage.addChild(gameScene);
+	gameScene.visible = false;
+
+	gameOverScene = new Container();
+	app.stage.addChild(gameOverScene);
+	gameOverScene.visible = false;
 
 	app.ticker.add(loop);
 }
@@ -81,18 +166,41 @@ document.body.onkeydown = function (e) {
 document.body.onkeyup = function (e) {
 	// console.log("onkeyup: ", e.code);
 
+	if (e.code == "Space") {
+		app.stage.removeChild(usernameLabel);
+		startupScene.removeChild(wrappedUsername);
+		username.style.display = "none";
+		startupScene.removeChild(triangle);
+		startupScene.visible = false;
+		gameScene.addChild(square)
+		gameScene.visible = true;
+	}
+
 	if (e.code == "Enter") {
 		if (enter_cnt == 0) {
-			chatInput.style.display = "block";
-			chatInput.focus();
+			if (startupScene.visible) {
+				username.style.display = "block";
+				username.focus();
+			} else if( gameScene.visible) {
+				chatInput.style.display = "block";
+				chatInput.focus();
+			} else {
+
+			}
 		}
-		if (enter_cnt == 1) {
-			chatInput.style.display = "none"; // leave this in for now > may help with performance if display is removed
-			// blur removes focus > not needed if we set display to none, but leaving for now...
-			chatInput.blur();
-			chatInput.submit;
-			var inputMessage = chatInput.value;
-			chatInput.value = "";
+		if (enter_cnt >= 1) {
+			if (startupScene.visible) {
+				console.log("startupScene enter!")
+			} else if(gameScene.visible) {
+				chatInput.style.display = "none"; // leave this in for now > may help with performance if display is removed
+				// blur removes focus > not needed if we set display to none, but leaving for now...
+				chatInput.blur();
+				chatInput.submit;
+				var inputMessage = chatInput.value;
+				chatInput.value = "";
+			} else {
+
+			}
 
 			const style = new TextStyle({
 				fontFamily: "space",
@@ -117,7 +225,7 @@ document.body.onkeyup = function (e) {
 				app.stage.addChild(message);
 
 				if (first_enter) {
-					message.y = wrappedElement.y - 200;
+					message.y = wrappedChatInput.y - 200;
 					previousMessageY = message.y
 					console.log("message.y: ", message.y);
 					first_enter = false;
@@ -129,7 +237,7 @@ document.body.onkeyup = function (e) {
 				previousMessageY = message.y;
 				console.log("message.y: ", message.y, ", previousMessageY: ", previousMessageY);
 
-				if (message.y >= wrappedElement.y - messageStepSize) {
+				if (message.y >= wrappedChatInput.y - messageStepSize) {
 					app.stage.removeChild(chatMessages[0]);
 					previousMessageY -= messageStepSize;
 					app.renderer.render(app.stage);
