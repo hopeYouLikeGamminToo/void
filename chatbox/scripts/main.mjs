@@ -1,5 +1,5 @@
 import { Application, Container, Loader, SCALE_MODES, Sprite, settings, Text, TextStyle} from './pixi.mjs';
-import ElementWrapper from './element-wrapper.mjs';
+import ElementWrapper from './libs/element-wrapper.mjs';
 
 console.log("chatbox sandbox > building sand castles");
 console.log("press enter to input username")
@@ -16,6 +16,10 @@ let gameOverScene;
 let title;
 let triangle;
 
+
+/*********************
+ *  APP.mjs > should pretty much just be this
+ **********************/
 var app = new Application({
     // options
     autoResize: true,
@@ -112,6 +116,7 @@ app.stage.addChild(wrappedUsername);
 	END OF MOVE TO SETUP FXN > (everything that gets added to stage > add to proper stage plz)
 ******************************/
 
+// loader calls setup
 Loader.shared
 		.add(['images/void.png'])
 		.add(['images/triangle.jpeg'])
@@ -157,6 +162,9 @@ function setup() {
 	app.ticker.add(loop);
 }
 
+/***************************
+ *  INPUT HANDLER SCRIPT
+ ***************************/
 let keys = []
 let enter_cnt = 0;
 let first_enter = true;
@@ -263,6 +271,10 @@ document.body.onkeyup = function (e) {
 	delete keys[e.code];
 };
 
+
+/************************
+ *  THE GAME LOOP
+ ************************/
 function loop(){
 
 }
