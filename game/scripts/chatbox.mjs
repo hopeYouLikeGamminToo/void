@@ -60,7 +60,7 @@ export class Chatbox {
             fontSize: 12,
             fill: "#9A8FD9",
             wordWrap: true,
-            wordWrapWidth: 300,
+            wordWrapWidth: 350,
             // TODO:    wordWrapWidth does not work well > should count characters... 
             //          may still need wordwrap for small characters...
         });

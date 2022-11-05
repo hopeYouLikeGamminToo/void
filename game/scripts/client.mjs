@@ -69,7 +69,9 @@ function sendToServer(msg) {
     }
 
     // log("Sending message: " + msgJSON);
-    connection.send(msgJSON);
+    if (connection.readyState) {
+        connection.send(msgJSON);
+    }
 }
 
 // Called when the "id" message is received; this message is sent by the
