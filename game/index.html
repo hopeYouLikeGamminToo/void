@@ -10,35 +10,58 @@
 
 <body>
     <!-- <div id="useFont">_</div> -->
+    <script src="./scripts/client.mjs" type="module"></script>
+    <script src="./scripts/libs/adapter.mjs" type="module"></script>
+
     <script id="pixi-canvas" src="./scripts/app.mjs" type="module"></script>
     <input id="chatInput" type="text" name="chatInput">
     <form id="loginForm">
         <div class="container">
             <label>
                 Username
-                <input type="text" name="username" required>
+                <input type="text" name="username" id="username" required>
             </label>
 
-            <br/>
-            <br/>
+            <br />
+            <br />
 
             <label>
                 Password
                 <input type="password" name="password" required>
             </label>
-            
-            <br/>
-            <br/>
 
-            <button name="button" type="submit">login</button>
-            <!-- <label> -->
+            <br />
+            <br />
+
+            <button name="button" type="submit" id="connect">login</button>
+            
             <input type="checkbox" checked="checked" name="remember"> Remember me
-            <!-- </label> -->
         </div>
     </form>
-    <!-- <input id="loginForm" type="text" name="loginForm"> -->
 
-    <!-- <input id="username" type="text" name="username"> -->
+    <!-- <div class="webrtc" id="useFont">
+        <div class="infobox">
+            <input id="name" type="text" maxlength="12" required autocomplete="username" inputmode="verbatim"
+                placeholder="Username">
+            <input type="button" name="login" value="Log in" id="connect">
+        </div>
+        <ul class="userlistbox"></ul>
+        <div class="chatbox"></div>
+        <div class="camerabox">
+            <video id="received_video" autoplay></video>
+            <video id="local_video" autoplay muted></video>
+            <button id="hangup-button" role="button" disabled>
+                Hang Up
+            </button>
+        </div>
+        <div class="empty-container"></div>
+        <div class="chat-controls">
+            chat:
+            <input id="text" type="text" name="text" size="100" maxlength="256"
+                placeholder="Say something meaningful..." autocomplete="off" disabled>
+            <input type="button" id="send" name="send" value="Send" disabled>
+        </div>
+    </div> -->
 </body>
 
 </html>

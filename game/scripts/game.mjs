@@ -1,12 +1,42 @@
-import { ticker, splash, start, game, end, login, chatbox, player } from "./app.mjs"
+import { Player } from './player.mjs'
 import * as input from "./input.mjs";
+import { app, splash, start, game, end, login, chatbox, player } from "./app.mjs"
+import { playerList, sendToServer, log } from "./client.mjs";
 
 // pixijs runs @ 60 FPS
 let frame = 0;
 
+export let peerState = [];
+// [{
+//     "username": {
+//         "player": null,
+//         "ts": null,
+//         "character": null,
+//         "x": null,
+//         "y": null,
+//         "animation": null,
+//         "playerCount": null
+//     }
+// }]
+
+let playerCount = 1;
+let player2;
+
+export function addPlayer() {
+    playerList.forEach(function (username) {
+        if (username != player.username) {
+            console.log("peerState:", peerState);
+            player2 = new Player(app, game, username, "kraken"); // add more characters!
+            player2.sprite.x = peerState[username].x;
+            player2.sprite.y = peerState[username].y;
+            // player2.sprites = peerState[username].animation;
+        }
+    });
+}
+
 export function splashLoop() {
     frame += 1;
-    if (frame == 1) { 
+    if (frame == 1) {
         console.log("splash stage");
     }
 
@@ -16,8 +46,8 @@ export function splashLoop() {
         splash.visible = false;
         start.visible = true;
 
-        ticker.remove(splashLoop);
-        ticker.add(startLoop);
+        app.ticker.remove(splashLoop);
+        app.ticker.add(startLoop);
     }
 }
 
@@ -29,8 +59,8 @@ export function startLoop() {
 
     if (!splash.visible && game.visible) {
         frame = 0;
-        ticker.remove(startLoop);
-        ticker.add(gameLoop);
+        app.ticker.remove(startLoop);
+        app.ticker.add(gameLoop);
     }
 }
 
@@ -39,6 +69,25 @@ export function gameLoop() {
     if (frame == 1) {
         console.log("game stage");
         player.username = login.info[0];
+    }
+
+    console.log("peerState: ",peerState);
+    console.log("Object.keys(peerState).length", Object.keys(peerState).length)
+    if (Object.keys(peerState).length > playerCount) {
+        playerCount += 1
+        console.log("boom! ", playerCount);
+        addPlayer();
+        // TODO: drop players too
+    }
+
+    if (playerCount > 1) {
+        playerList.forEach(function (username) {
+            if (username != player.username){
+                player2.sprite.x = peerState[username].x;
+                player2.sprite.y = peerState[username].y;
+                player2.sprite.setAnimation(peerState[username].animation);
+            }
+        });
     }
 
     if (input.type == 'keyboard') { // keyboard
@@ -57,7 +106,7 @@ export function gameLoop() {
                 player.sprite.x -= player.speed;
             } else if (input.keyboard["KeyD"]) {
                 player.sprite.x += player.speed;
-            } 
+            }
         } else if (input.keyboard["KeyA"]) {
             // console.log("run left!");
             player.sprite.setAnimation('RunLeft');
@@ -75,7 +124,20 @@ export function gameLoop() {
             player.sprite.setAnimation('Idle');
         }
     }
-    
+
+    // share game state with signaling server & thus other connected clients
+    var ts = Date.now();
+    var msg = {
+        "ts": ts,
+        "username": player.username,
+        "character": player.character,
+        "x": player.sprite.x, 
+        "y": player.sprite.y,
+        "animation": player.sprite.currentAnimation,
+        "playerCount": peerState.length + 1
+    }
+    sendToServer(msg);
+
     // updateBullets();
 
     //detect collisions

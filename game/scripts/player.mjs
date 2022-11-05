@@ -30,6 +30,8 @@ export class Player {
         this.sprite = sprite; 
         
         this.username = username;
+        this.password = null;
+        this.remember = null;
         this.character = character;
         this.stage = stage;
         // this._resources = resources;

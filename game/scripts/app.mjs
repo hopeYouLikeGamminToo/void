@@ -81,6 +81,7 @@ function setup() {
 	app.ticker.add(splashLoop);
 }
 
+// this needs some rework > should not have to edit json file to load assets
 async function loadCharacterAssets(character){
     let spritesheetPath = "./assets/" + character + "/" + character + ".json";
 

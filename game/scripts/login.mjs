@@ -1,4 +1,4 @@
-import { start, game } from "./app.mjs"
+import { start, game, player } from "./app.mjs"
 import ElementWrapper from './libs/element-wrapper.mjs';
 
 export class Login {
@@ -11,7 +11,7 @@ export class Login {
             this.submit();
         });
         
-        // styling for chatbox > should try adding to style.css...
+        // style.css breaks fullscreen
         this.form.style.fontFamily = 'space';
         this.form.style.color = "#9A8FD9";
         this.form.style.display = "block";
@@ -73,9 +73,14 @@ export class Login {
         // console.log("this.wrappedForm: ", this.wrappedForm);
 
         this.info = []
-        this.info.push(this.wrappedForm.target.elements['username'].value);
-        this.info.push(this.wrappedForm.target.elements['password'].value);
-        this.info.push(this.wrappedForm.target.elements['remember'].checked);
+        player.username = this.wrappedForm.target.elements['username'].value;
+        player.password = this.wrappedForm.target.elements['password'].value;
+        player.remember = this.wrappedForm.target.elements['remember'].checked;
+
+        this.info.push(player.username);
+        this.info.push(player.password);
+        this.info.push(player.remember);
+        
         console.log("login.info: ", this.info)
         this.wrappedForm.target.value = [];
 
