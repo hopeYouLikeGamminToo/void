@@ -7,17 +7,6 @@ import { playerList, sendToServer, log } from "./client.mjs";
 let frame = 0;
 
 export let peerState = [];
-// [{
-//     "username": {
-//         "player": null,
-//         "ts": null,
-//         "character": null,
-//         "x": null,
-//         "y": null,
-//         "animation": null,
-//         "playerCount": null
-//     }
-// }]
 
 let playerCount = 1;
 let player2;
@@ -25,7 +14,7 @@ let player2;
 export function addPlayer() {
     playerList.forEach(function (username) {
         if (username != player.username) {
-            console.log("peerState:", peerState);
+            // console.log("peerState:", peerState);
             player2 = new Player(app, game, username, "kraken"); // add more characters!
             player2.sprite.x = peerState[username].x;
             player2.sprite.y = peerState[username].y;
@@ -71,8 +60,8 @@ export function gameLoop() {
         player.username = login.info[0];
     }
 
-    console.log("peerState: ",peerState);
-    console.log("Object.keys(peerState).length", Object.keys(peerState).length)
+    // console.log("peerState: ",peerState);
+    // console.log("Object.keys(peerState).length", Object.keys(peerState).length)
     if (Object.keys(peerState).length > playerCount) {
         playerCount += 1
         console.log("boom! ", playerCount);
@@ -128,6 +117,7 @@ export function gameLoop() {
     // share game state with signaling server & thus other connected clients
     var ts = Date.now();
     var msg = {
+        "type": 'game',
         "ts": ts,
         "username": player.username,
         "character": player.character,

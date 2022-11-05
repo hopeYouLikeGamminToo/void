@@ -1,4 +1,5 @@
 import { addPlayer, peerState } from "./game.mjs";
+import { chatbox } from "./app.mjs";
 
 // Get our hostname
 var myHostname = window.location.hostname;
@@ -67,7 +68,7 @@ function sendToServer(msg) {
         var msgJSON = JSON.stringify(msg.data);
     }
 
-    log("Sending message: " + msgJSON);
+    // log("Sending message: " + msgJSON);
     connection.send(msgJSON);
 }
 
@@ -114,15 +115,14 @@ function connect() {
     }
 
     connection.onmessage = function (evt) {
-        var chatBox = document.querySelector(".chatbox");
+        // var chatBox = document.querySelector(".chatbox");
         var text = "";
         var msg = JSON.parse(evt.data);
-        log("Message received: ");
-        console.dir(msg);
-        var time = new Date(msg.date);
-        var timeStr = time.toLocaleTimeString();
+        // console.log("message received: ", msg);
+        // var time = new Date(msg.date);
+        // var timeStr = time.toLocaleTimeString();
 
-        console.log("msg.type: ", msg.type)
+        // console.log("msg.type: ", msg.type)
 
         switch (msg.type) {
             case "id":
@@ -135,7 +135,9 @@ function connect() {
                 break;
 
             case "message":
-                text = "(" + timeStr + ") <b>" + msg.name + "</b>: " + msg.text + "<br>";
+                console.log("message: ", msg);
+                // text = "(" + timeStr + ") <b>" + msg.name + "</b>: " + msg.text + "<br>";
+                chatbox.addMessage(msg);
                 break;
 
             case "rejectusername":
@@ -145,7 +147,8 @@ function connect() {
                 break;
 
             case "userlist":      // Received an updated user list
-                handleUserlistMsg(msg);
+                console.log("msg.users", msg.users);
+                playerList = msg.users;
                 break;
 
             // Signaling messages: these messages are used to trade WebRTC
@@ -166,11 +169,23 @@ function connect() {
             // case "hang-up": // The other peer has hung up the call
             //     handleHangUpMsg(msg);
             //     break;
+            case "game":
+                // console.log("peerState: ", peerState);
+                peerState[msg.username] = {
+                            "player": 0,
+                            "ts": msg.ts,
+                            "character": msg.character,
+                            "x": msg.x,
+                            "y": msg.y,
+                            "animation": msg.animation,
+                            "playerCount": msg.playerCount
+                };
+                break;
 
             // Unknown message; output to console for debugging.
             default:
                 try {
-                    console.log("peerState: ", peerState);
+                    // console.log("peerState: ", peerState);
                     peerState[msg.username] = {
                                 "player": 0,
                                 "ts": msg.ts,
@@ -179,7 +194,8 @@ function connect() {
                                 "y": msg.y,
                                 "animation": msg.animation,
                                 "playerCount": msg.playerCount
-                    }
+                    };
+                    break;
                 } catch {
                     log_error("Unknown message received:");
                     log_error(msg);
@@ -369,7 +385,7 @@ function handleICEGatheringStateChangeEvent(event) {
 // Given a message containing a list of usernames, this function
 // populates the user list box with those names, making each item
 // clickable to allow starting a video call.
-function handleUserlistMsg(msg) {
+// function handleUserlistMsg(msg) {
     // var i;
     // var listElem = document.querySelector(".userlistbox");
 
@@ -380,8 +396,8 @@ function handleUserlistMsg(msg) {
     //     listElem.removeChild(listElem.firstChild);
     // }
 
-    console.log("msg.users", msg.users);
-    playerList = msg.users;
+    // console.log("msg.users", msg.users);
+    // playerList = msg.users;
 
     // Add member names from the received list.
     // msg.users.forEach(function (username) {
@@ -391,7 +407,7 @@ function handleUserlistMsg(msg) {
 
     //     listElem.appendChild(item);
     // });
-}
+// }
 
 // Close the RTCPeerConnection and reset variables so that the user can
 // make or receive another call if they wish. This is called both

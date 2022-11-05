@@ -1,6 +1,10 @@
 import { Text, TextStyle } from './libs/pixi.mjs';
 import ElementWrapper from './libs/element-wrapper.mjs';
 
+import { sendToServer, playerList } from "./client.mjs";
+import { player } from './app.mjs';
+
+
 export class Chatbox {
     constructor(renderer, stage) {
         this.input = document.getElementById("chatInput");
@@ -47,6 +51,57 @@ export class Chatbox {
         this.input.focus();
     }
 
+    addMessage(msg) {
+        
+        let message = `${msg.username}: ${msg.text}`
+
+        let style = new TextStyle({
+            fontFamily: "space",
+            fontSize: 12,
+            fill: "#9A8FD9",
+            wordWrap: true,
+            wordWrapWidth: 300,
+            // TODO:    wordWrapWidth does not work well > should count characters... 
+            //          may still need wordwrap for small characters...
+        });
+
+        // let color;
+        if (msg.username != player.username) {
+            style.fill = "white";
+        } else {
+            style.fill = "#9A8FD9";
+        }
+
+        const pixiMessage = new Text(message, style);
+
+        this.chatMessages.push(pixiMessage);
+        this.stage.addChild(pixiMessage);
+
+        if (this.first_enter) {
+            pixiMessage.y = this.wrappedInput.y - 200;
+            this.previousMessageY = pixiMessage.y
+            this.first_enter = false;
+        }
+
+        pixiMessage.x = 25;
+        // console.log("message.width: ", message.width);
+        // console.log("Math.ceil(message.width / 250): ", Math.ceil(message.width / 250));
+        pixiMessage.y = this.previousMessageY + this.messageStepSize;
+        this.previousMessageY = pixiMessage.y + (this.messageStepSize * Math.ceil(pixiMessage.width / 250));
+
+        if (pixiMessage.y >= this.wrappedInput.y - (this.messageStepSize * 3)) {
+            // let removedMessageLength = this.chatMessages[0].width;
+            // console.log("removing this.chatMessages[0]: ", this.chatMessages[0])
+            this.stage.removeChild(this.chatMessages[0]);
+            this.previousMessageY -= this.messageStepSize * 2.5;
+            this.renderer.render(this.stage);
+            this.chatMessages.shift();
+            for (var i = 0; i < this.chatMessages.length; i++) {
+                this.chatMessages[i].y -= this.messageStepSize * 2.5;
+            }
+        }
+    }
+
     submitMessage(enter_cnt) {
         this.input.style.display = "none";
         this.input.blur();
@@ -55,46 +110,18 @@ export class Chatbox {
         var inputMessage = this.wrappedInput.target.value;
         this.wrappedInput.target.value = "";
 
-        const style = new TextStyle({
-            fontFamily: "space",
-            fontSize: 12,
-            fill: "#9A8FD9",
-            wordWrap: true,
-            wordWrapWidth: 300, 
-            // TODO:    wordWrapWidth does not work well > should count characters... 
-            //          may still need wordwrap for small characters...
-        });
-
-        const message = new Text(inputMessage, style);
+        // const message = new Text(inputMessage, style);
         // console.log("inputMessage: ", inputMessage);
 
         if (inputMessage != "") {
-            this.chatMessages.push(message);
-            this.stage.addChild(message);
-
-            if (this.first_enter) {
-                message.y = this.wrappedInput.y - 200;
-                this.previousMessageY = message.y
-                this.first_enter = false;
-            }
-
-            message.x = 25;
-            // console.log("message.width: ", message.width);
-            // console.log("Math.ceil(message.width / 250): ", Math.ceil(message.width / 250));
-            message.y = this.previousMessageY + this.messageStepSize;
-            this.previousMessageY = message.y + (this.messageStepSize * Math.ceil(message.width / 250));
-
-            if (message.y >= this.wrappedInput.y - (this.messageStepSize * 3)) {
-                let removedMessageLength = this.chatMessages[0].width;
-                // console.log("removing this.chatMessages[0]: ", this.chatMessages[0])
-                this.stage.removeChild(this.chatMessages[0]);
-                this.previousMessageY -= this.messageStepSize * 2.5;
-                this.renderer.render(this.stage);
-                this.chatMessages.shift();
-                for (var i = 0; i < this.chatMessages.length; i++) {
-                    this.chatMessages[i].y -= this.messageStepSize * 2.5;
-                }
-            }
+            // this.addMessage(inputMessage);
+            var ts = Date.now();
+            sendToServer({
+                "type": "message",
+                "ts": ts,
+                "username": player.username,
+                "text": inputMessage
+            });
         }
         enter_cnt = -1;
         return enter_cnt
