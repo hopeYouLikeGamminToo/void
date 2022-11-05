@@ -6,14 +6,14 @@ import { Input } from './input.mjs'
 import { Login } from './login.mjs'
 import { splashLoop } from './game.mjs'
 
-settings.RESOLUTION = window.devicePixelRatio;
+// settings.RESOLUTION = window.devicePixelRatio;
 settings.SCALE_MODE = SCALE_MODES.NEAREST;
 
 // https://pixijs.download/release/docs/PIXI.Application.html
 export var app = new Application({
     autoResize: true,
     resizeTo: window,
-    resolution: devicePixelRatio,
+    resolution: window.devicePixelRatio,
     width: window.outerWidth,
     height: window.outerHeight,
     backgroundColor: 0x000000,
@@ -31,6 +31,8 @@ export let end;
 // declare chatbox and login globally
 export let chatbox;
 export let login;
+
+export let kraken;
 
 // declare game objects globally
 // let title;
@@ -66,17 +68,13 @@ function setup() {
     app.stage.addChild(end);
     end.visible = false;
 
-    // create client's player object
-    // username and character should be supplied from client.mjs
-    // let username = "Juniper";
-    // let character = "kraken";
-
-    let title = "void";
-    let logo = new Player(app, splash, null, title)
-    logo.position(app.view.width / 6, app.view.height / 6);
+    let logo = new Player(app, splash, null, 'void')
+    logo.position(window.outerWidth / 2, window.outerHeight / 2);
 
     login = new Login(app.renderer, start);
-    chatbox = new Chatbox(app.renderer, splash);
+    chatbox = new Chatbox(app.renderer, game);
+    kraken = new Player(app, game, null, 'kraken');
+    kraken.position(window.outerWidth / 2, window.outerHeight / 2);
 
     let input = new Input(); // configures document events
 
@@ -86,7 +84,7 @@ function setup() {
 async function loadCharacterAssets(character){
     let spritesheetPath = "./assets/" + character + "/" + character + ".json";
 
-    console.log(`loading ${character} from "${spritesheetPath}"`);
+    // console.log(`loading ${character} from "${spritesheetPath}"`);
 
     await app.loader
         .use(function (resource, next) {

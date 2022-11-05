@@ -35,9 +35,8 @@ export class Chatbox {
         this.first_enter = true;
         this.previousMessageY;
         this.chatMessages = [];
-        this.messageStepSize = 20;
+        this.messageStepSize = 10;
 
-        // // wait to add chatInput to scene
         this.stage = stage;
         this.renderer = renderer;
         this.stage.addChild(this.wrappedInput);
@@ -61,11 +60,13 @@ export class Chatbox {
             fontSize: 12,
             fill: "#9A8FD9",
             wordWrap: true,
-            wordWrapWidth: 300,
+            wordWrapWidth: 300, 
+            // TODO:    wordWrapWidth does not work well > should count characters... 
+            //          may still need wordwrap for small characters...
         });
 
         const message = new Text(inputMessage, style);
-        console.log("inputMessage: ", inputMessage);
+        // console.log("inputMessage: ", inputMessage);
 
         if (inputMessage != "") {
             this.chatMessages.push(message);
@@ -78,18 +79,20 @@ export class Chatbox {
             }
 
             message.x = 25;
-            console.log("message.width: ", message.width);
-            message.y = this.previousMessageY + (this.messageStepSize * Math.ceil(message.width / 300));
-            this.previousMessageY = message.y;
+            // console.log("message.width: ", message.width);
+            // console.log("Math.ceil(message.width / 250): ", Math.ceil(message.width / 250));
+            message.y = this.previousMessageY + this.messageStepSize;
+            this.previousMessageY = message.y + (this.messageStepSize * Math.ceil(message.width / 250));
 
-            if (message.y >= this.wrappedInput.y - this.messageStepSize) {
+            if (message.y >= this.wrappedInput.y - (this.messageStepSize * 3)) {
+                let removedMessageLength = this.chatMessages[0].width;
+                // console.log("removing this.chatMessages[0]: ", this.chatMessages[0])
                 this.stage.removeChild(this.chatMessages[0]);
-                this.previousMessageY -= this.messageStepSize;
+                this.previousMessageY -= this.messageStepSize * 2.5;
                 this.renderer.render(this.stage);
                 this.chatMessages.shift();
-                console.log("this.chatMessages: ", this.chatMessages)
                 for (var i = 0; i < this.chatMessages.length; i++) {
-                    this.chatMessages[i].y -= this.messageStepSize;
+                    this.chatMessages[i].y -= this.messageStepSize * 2.5;
                 }
             }
         }

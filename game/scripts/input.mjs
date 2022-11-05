@@ -1,7 +1,6 @@
 
-import { splash, start, game, end, chatbox, login} from "./app.mjs";
+import { splash, start, game, end, chatbox, login } from "./app.mjs";
 // import { login } from "./game.mjs";
-
 
 export class Input {
     constructor() {
@@ -16,16 +15,19 @@ export class Input {
             // console.log("onkeyup: ", e.code);
 
             if (e.code == "Space") {
-                console.log("space!");
+                // console.log("space!");
             }
 
             if (e.code == "Enter") {
-                console.log("enter: ", enterCount)
                 if (enterCount == 0) {
                     if (splash.visible) {
-                        chatbox.inputMessage();
+                        // chatbox.inputMessage();
+                        console.log("splash.visible");
                     } else if (start.visible) {
-                        login.submit(); // should submit with button only here...
+                        enterCount = -1;
+                        // login.submit(); // should submit with button only here...
+                        // start.visible = false;
+                        // game.visible = true;
                     } else if (game.visible) {
                         chatbox.inputMessage();
                     } else if (end.visible) {
@@ -36,7 +38,18 @@ export class Input {
                     // chatbox.inputMessage();
                 }
                 if (enterCount >= 1) {
-                    enterCount = chatbox.submitMessage(enterCount);
+                    if (splash.visible) {
+                        // chatbox.inputMessage();
+                        console.log("splash.visible");
+                    } else if (start.visible) {
+                        // login.submit(); // should submit with button only here...
+                    } else if (game.visible) {
+                        enterCount = chatbox.submitMessage(enterCount);
+                    } else if (end.visible) {
+                        console.log("end.visible");
+                    } else {
+                        console.log("enterCount = ", enterCount, ", but not sure what to do...")
+                    }
                 }
                 enterCount += 1;
             }

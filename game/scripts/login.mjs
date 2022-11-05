@@ -1,40 +1,57 @@
-import { Text, TextStyle } from './libs/pixi.mjs';
+import { start, game } from "./app.mjs"
 import ElementWrapper from './libs/element-wrapper.mjs';
 
 export class Login {
     constructor(renderer, stage) {
-        console.log(
-            "renderer: ", renderer,
-            "stage: ", stage
-        )
         this.form = document.getElementById("loginForm");
 
+        this.form.addEventListener('submit', (event) => {
+            // stop form submission
+            event.preventDefault();
+            this.submit();
+        });
+        
         // styling for chatbox > should try adding to style.css...
         this.form.style.fontFamily = 'space';
         this.form.style.color = "#9A8FD9";
-        this.form.style.border = "black";
-        this.form.style.backgroundColor = "black";
-        this.form.style.outlineColor = "black";
-        // this.form.style.outlineWidth = "0px";
-        // this.form.style.outlineStyle = "none";
-        this.form.style.outlineOffset = "0px";
-        this.form.style.overflow = "hidden";
-        this.form.style.pointerEvents = "none";
-        this.form.style.padding = "0px";
-        this.form.style.margin = "0px";
-        this.form.style.lineHeight = "0px";
+        this.form.style.display = "block";
+        // this.form.style.flexDirection = "row";
+        // this.form.style.justifyContent = "flex-end";
+        this.form.style.textAlign = "left";
+
         this.form.style.appearance = "none";
-        this.form.style.whiteSpace = "nowrap";
         this.form.style.position = "absolute";
-        // move input form off screen > wrapped element will be in canvas
         this.form.style.left = "-999em";
-        this.form.style.display = 'block'; // block = show; none = hidden
-        this.form.focus();
+
+        this.form['username'].style.fontFamily = 'inherit';
+        this.form['password'].style.fontFamily = 'inherit';
+        this.form['button'].style.fontFamily = 'inherit';
+
+        this.form['username'].style.display = "block";
+        this.form['password'].style.display = "block";
+        this.form['button'].style.display = "inline ";
+
+        this.form['username'].style.color = "grey";
+        this.form['username'].style.borderColor = "white";
+        this.form['username'].style.backgroundColor = "black";
+        // this.form['username'].style.outlineColor = "black";
+        this.form['username'].focus()
+
+        this.form['password'].style.color = "grey";
+        this.form['password'].style.borderColor = "white";
+        this.form['password'].style.backgroundColor = "black";
+        // this.form['password'].style.outlineColor = "white";
+        // this.form['password'].focus()
+
+        this.form['button'].style.color = "#9A8FD9";
+        // this.form['username'].style.border = "grey";
+        this.form['button'].style.backgroundColor = "#404040";
+        // this.form['username'].style.outlineColor = "grey";
 
         this.wrappedForm = new ElementWrapper(this.form);
 
-        this.wrappedForm.x =  300;
-        this.wrappedForm.y =  300;
+        this.wrappedForm.x =  window.outerWidth / 2 - 200;
+        this.wrappedForm.y =  window.outerHeight / 2 - 100;
 
         // chatbox helper variables
         this.first_enter = true;
@@ -53,8 +70,16 @@ export class Login {
         this.form.blur();
         this.form.submit;
 
-        var loginInfo = this.wrappedForm.target.value;
-        this.wrappedForm.target.value = "";
-        console.log("loginInfo: ", loginInfo)
+        // console.log("this.wrappedForm: ", this.wrappedForm);
+
+        this.info = []
+        this.info.push(this.wrappedForm.target.elements['username'].value);
+        this.info.push(this.wrappedForm.target.elements['password'].value);
+        this.info.push(this.wrappedForm.target.elements['remember'].checked);
+        console.log("login.info: ", this.info)
+        this.wrappedForm.target.value = [];
+
+        start.visible = false;
+        game.visible = true;
     }
 }

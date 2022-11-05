@@ -3,10 +3,55 @@
     src: url('font/space.ttf');
 }
 
-#useFont {
+/* #useFont {
     font-family: 'space';
     font-size: "0px";
-}
+} */
+
+/* breaking full-screen > styling done in class constructor */
+/* #chatInput {
+    font-family: 'space';
+    color: "#9A8FD9";
+    border: "black";
+    background-color: "black";
+    outline-color: "black";
+    // outline-width: "0px";
+    // outline-style: "none";
+    outline-offset: "0px";
+    overflow: "hidden";
+    pointer-events: "none";
+    padding: "0px";
+    margin: "0px";
+    line-height: "0px";
+    appearance: "none";
+    white-space: "nowrap";
+    position: "absolute";
+    // move input form off screen > wrapped element will be in canvas
+    left: "-999em";
+    display: 'none';
+} */
+
+/* #loginForm {
+    font-family: 'space';
+    color: "#9A8FD9";
+    border: "black";
+    background-color: "black";
+    outline-color: "black";
+    // outline-width: "0px";
+    // outline-style: "none";
+    outline-offset: "0px";
+    overflow: "hidden";
+    // pointer-events: "none";
+    padding: "0px";
+    margin: "0px";
+    line-height: "0px";
+    appearance: "none";
+    white-space: "nowrap";
+    position: "absolute";
+    // move input form off screen > wrapped element will be in canvas
+    left: "-999em";
+    display: 'none'; 
+} */
 
 body {
     position: absolute;

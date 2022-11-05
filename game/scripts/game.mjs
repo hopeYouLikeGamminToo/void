@@ -1,19 +1,19 @@
-import { app, splash, start, game, end } from "./app.mjs"
-// import { Login } from './login.mjs'
+import { app, splash, start, game, end, login, chatbox, kraken } from "./app.mjs"
 
-
+// pixijs runs @ 60 FPS
 let frame = 0;
-// export let login;
 
 export function splashLoop() {
     frame += 1;
-    if (frame % 300 == 0) {
+    if (frame == 1) { 
+        console.log("splash stage");
+    }
+
+    // change splash screen duration for production
+    if (frame % 60 == 0) {
         frame = 0;
-        console.log("splash > start");
         splash.visible = false;
         start.visible = true;
-
-        // login = new Login(app.renderer, start);
 
         app.ticker.remove(splashLoop);
         app.ticker.add(startLoop);
@@ -21,8 +21,22 @@ export function splashLoop() {
 }
 
 export function startLoop() {
+    frame += 1;
+    if (frame == 1) {
+        console.log("login stage");
+    }
 
+    if (!splash.visible && game.visible) {
+        frame = 0;
+        app.ticker.remove(startLoop);
+        app.ticker.add(gameLoop);
+    }
 }
 
 export function gameLoop() {
+    frame += 1;
+    if (frame == 1) {
+        console.log("game stage");
+        kraken.username = login.info[0];
+    }
 }

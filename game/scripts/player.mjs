@@ -2,7 +2,9 @@ import {AnimatedSprite, Container, Sprite, Texture} from './libs/pixi.mjs';
 
 export class Player {
     constructor(app, stage, username, character) {
-        console.log(`assigning ${character} to ${username}`);
+        if (username != null) {
+            console.log(`assigning ${character} to ${username}`);
+        }
         
         let sprite;
         let resources = app.loader.resources;
@@ -25,29 +27,29 @@ export class Player {
         // super(player);
         // would be nice to use super here...
         // need to figure out how to extend player class
-        this._sprite = sprite; 
+        this.sprite = sprite; 
         
-        this._username = username;
-        this._character = character;
-        this._stage = stage;
+        this.username = username;
+        this.character = character;
+        this.stage = stage;
         // this._resources = resources;
 
         // future parameters...
         // this._characer = character;
         // this._health = 100;
         // this._position = position;
-        // this._sprite = sprite;
+        // this.sprite = sprite;
 
         // this will be dependent on character, specials, wearables, armor, etc.
         // this.melee_strength = 10;
         // this.jump_height = 20;
 
-        this._stage.addChild(this._sprite);
+        this.stage.addChild(this.sprite);
     }
 
     position(x, y) {
-        this._sprite.x = x;
-        this._sprite.y = y;
+        this.sprite.x = x  - (this.sprite.width / 2);
+        this.sprite.y = y - (this.sprite.height / 2);
     }
 
 }
