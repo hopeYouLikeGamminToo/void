@@ -31,13 +31,13 @@ export class Login {
         this.form['password'].style.display = "block";
         this.form['button'].style.display = "inline ";
 
-        this.form['username'].style.color = "grey";
+        this.form['username'].style.color = "white";
         this.form['username'].style.borderColor = "white";
         this.form['username'].style.backgroundColor = "black";
         // this.form['username'].style.outlineColor = "black";
         this.form['username'].focus()
 
-        this.form['password'].style.color = "grey";
+        this.form['password'].style.color = "white";
         this.form['password'].style.borderColor = "white";
         this.form['password'].style.backgroundColor = "black";
         // this.form['password'].style.outlineColor = "white";
