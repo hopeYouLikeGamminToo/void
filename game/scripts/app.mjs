@@ -2,7 +2,6 @@ import { Application, Container, Loader, Sprite, SCALE_MODES, settings, } from '
 
 import { Player } from './player.mjs'
 import { Chatbox } from './chatbox.mjs'
-import { Input } from './input.mjs'
 import { Login } from './login.mjs'
 import { splashLoop } from './game.mjs'
 
@@ -22,6 +21,8 @@ export var app = new Application({
 
 document.body.appendChild(app.view);
 
+export let ticker = app.ticker;
+
 // declare game scenes globally
 export let splash;
 export let start;
@@ -32,7 +33,8 @@ export let end;
 export let chatbox;
 export let login;
 
-export let kraken;
+// export player
+export let player;
 
 // declare game objects globally
 // let title;
@@ -73,10 +75,8 @@ function setup() {
 
     login = new Login(app.renderer, start);
     chatbox = new Chatbox(app.renderer, game);
-    kraken = new Player(app, game, null, 'kraken');
-    kraken.position(window.outerWidth / 2, window.outerHeight / 2);
-
-    let input = new Input(); // configures document events
+    player = new Player(app, game, null, 'kraken'); // default to kraken for now
+    player.position(window.outerWidth / 2, window.outerHeight / 2);
 
 	app.ticker.add(splashLoop);
 }

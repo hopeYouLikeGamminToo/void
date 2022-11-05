@@ -38,7 +38,8 @@ export class Player {
         // this._characer = character;
         // this._health = 100;
         // this._position = position;
-        // this.sprite = sprite;
+        this.speed = 5;
+        this.jump = 2;
 
         // this will be dependent on character, specials, wearables, armor, etc.
         // this.melee_strength = 10;
