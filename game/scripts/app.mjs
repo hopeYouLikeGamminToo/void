@@ -15,7 +15,7 @@ export var app = new Application({
     resolution: window.devicePixelRatio,
     width: window.outerWidth,
     height: window.outerHeight,
-    backgroundColor: 0x000000,
+    backgroundColor: 0x202020,
     autoDensity: true
 });
 
@@ -34,7 +34,7 @@ export let chatbox;
 export let login;
 
 // export player
-export let player;
+// export let player;
 
 // declare game objects globally
 // let title;
@@ -46,7 +46,7 @@ export let player;
 // 		.load(setup); // calling setup function after loading resources
 
 
-let assets = ["void", "spaceman", "kraken"];
+let assets = ["void", "spaceman", "kraken", "edward"];
 for (let i = 0; i < assets.length; i++)  {
     loadCharacterAssets(assets[i]);    
 }
@@ -75,8 +75,8 @@ function setup() {
 
     login = new Login(app.renderer, start);
     chatbox = new Chatbox(app.renderer, game);
-    player = new Player(app, game, null, 'kraken'); // default to kraken for now
-    player.position(window.outerWidth / 2, window.outerHeight / 2);
+    // player = new Player(app, game, null, 'edward'); // default to kraken for now
+    // player.position(window.outerWidth / 2, window.outerHeight / 2);
 
 	app.ticker.add(splashLoop);
 }

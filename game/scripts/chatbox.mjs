@@ -2,7 +2,8 @@ import { Text, TextStyle } from './libs/pixi.mjs';
 import ElementWrapper from './libs/element-wrapper.mjs';
 
 import { sendToServer, playerList } from "./client.mjs";
-import { player } from './app.mjs';
+import {self} from "./game.mjs";
+// import { player } from './app.mjs';
 
 
 export class Chatbox {
@@ -66,7 +67,7 @@ export class Chatbox {
         });
 
         // let color;
-        if (msg.username != player.username) {
+        if (msg.username != playerList[0]) {
             style.fill = "white";
         } else {
             style.fill = "#9A8FD9";
@@ -119,7 +120,7 @@ export class Chatbox {
             sendToServer({
                 "type": "message",
                 "ts": ts,
-                "username": player.username,
+                "username": playerList[self],
                 "text": inputMessage
             });
         }

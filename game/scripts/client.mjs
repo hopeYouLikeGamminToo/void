@@ -80,9 +80,9 @@ function sendToServer(msg) {
 // session.
 function setUsername() {
     username = document.getElementById("username").value;
-    console.log("username: ", username);
+    // console.log("username: ", username);
 
-    addPlayer(username);
+    // addPlayer(username);
 
     sendToServer({
         name: username,

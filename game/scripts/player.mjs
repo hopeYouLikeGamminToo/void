@@ -15,6 +15,9 @@ export class Player {
             case "spaceman":
                 sprite = new MultiAnimatedSprite(resources.spaceman.spritesheet);
                 break;
+            case "edward":
+                sprite = new MultiAnimatedSprite(resources.edward.spritesheet);
+                break; 
             case "void":
                 sprite = new MultiAnimatedSprite(resources.void.spritesheet);
                 // texture = Texture.from("./assets/void.gif");

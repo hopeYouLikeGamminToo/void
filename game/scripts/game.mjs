@@ -1,6 +1,7 @@
 import { Player } from './player.mjs'
 import * as input from "./input.mjs";
-import { app, splash, start, game, end, login, chatbox, player } from "./app.mjs"
+// import { app, splash, start, game, end, login, chatbox, player } from "./app.mjs"
+import { app, splash, start, game, end, login, chatbox } from "./app.mjs"
 import { playerList, sendToServer, log } from "./client.mjs";
 
 // pixijs runs @ 60 FPS
@@ -8,19 +9,27 @@ let frame = 0;
 
 export let peerState = [];
 
-let playerCount = 1;
-let player2;
+export let self;
+let playerCount = 0;
+let activeList = [];
+let player;
+let players = [];
 
+// should move these player functinos to player class... duh
 export function addPlayer() {
-    playerList.forEach(function (username) {
-        if (username != player.username) {
-            // console.log("peerState:", peerState);
-            player2 = new Player(app, game, username, "kraken"); // add more characters!
-            player2.sprite.x = peerState[username].x;
-            player2.sprite.y = peerState[username].y;
-            // player2.sprites = peerState[username].animation;
-        }
-    });
+    console.log("adding player");
+    console.log("peerState: ", peerState);
+
+    let difference = playerList.filter(x => !activeList.includes(x)).values();
+
+    for (const username of difference) {
+        let character = Math.random() < 0.5 ? "kraken" : "edward"
+        player = new Player(app, game, username, character); // add more characters! 
+        player.sprite.x = 200; // peerState[username].x;
+        player.sprite.y = 200; // peerState[username].y;
+        activeList.push(username);
+        players.push(player)
+      }
 }
 
 export function splashLoop() {
@@ -57,76 +66,91 @@ export function gameLoop() {
     frame += 1;
     if (frame == 1) {
         console.log("game stage");
-        player.username = login.info[0];
+        self = playerList.indexOf(login.info[0]);
     }
 
-    // console.log("peerState: ",peerState);
-    // console.log("Object.keys(peerState).length", Object.keys(peerState).length)
-    if (Object.keys(peerState).length > playerCount) {
+    if (playerList.length > activeList.length) {
+    // if (Object.keys(peerState).length > activeList.length) {
         playerCount += 1
-        console.log("boom! ", playerCount);
         addPlayer();
-        // TODO: drop players too
+    } else if (playerList.length < activeList.length) {
+        console.log("drop player");
     }
 
-    if (playerCount > 1) {
-        playerList.forEach(function (username) {
-            if (username != player.username){
-                player2.sprite.x = peerState[username].x;
-                player2.sprite.y = peerState[username].y;
-                player2.sprite.setAnimation(peerState[username].animation);
-            }
-        });
-    }
-
-    if (input.type == 'keyboard') { // keyboard
+    if (input.type == 'keyboard' && activeList.length > 0) { // keyboard
         if (input.keyboard['click']) {
             // console.log("shoot!");
-            player.sprite.setAnimation('Shoot');
+            players[self].sprite.setAnimation('Shoot');
         } else if (input.keyboard['Space']) {
             // console.log("space!");
             // player.setAnimation('Jump');
         } else if (input.keyboard["KeyW"]) {
             // console.log("jump!");
-            player.sprite.setAnimation('Jump');
-            player.sprite.y -= player.speed + player.jump;
+            players[self].sprite.setAnimation('Jump');
+            players[self].sprite.y -= players[self].speed + players[self].jump;
 
             if (input.keyboard["KeyA"]) {
-                player.sprite.x -= player.speed;
+                players[self].sprite.x -= players[self].speed;
             } else if (input.keyboard["KeyD"]) {
-                player.sprite.x += player.speed;
+                players[self].sprite.x += players[self].speed;
             }
         } else if (input.keyboard["KeyA"]) {
             // console.log("run left!");
-            player.sprite.setAnimation('RunLeft');
-            player.sprite.x -= player.speed;
+            players[self].sprite.setAnimation('RunLeft');
+            players[self].sprite.x -= players[self].speed;
         } else if (input.keyboard["KeyD"]) {
             // console.log("run right!");
-            player.sprite.setAnimation('RunRight');
-            player.sprite.x += player.speed;
+            players[self].sprite.setAnimation('RunRight');
+            players[self].sprite.x += players[self].speed;
         } else if (input.keyboard["KeyS"]) {
             // if touching platform > duck, else accelerate
             // console.log("duck!");
-            player.sprite.setAnimation('Duck');
-            player.sprite.y += player.speed;
+            players[self].sprite.setAnimation('Duck');
+            players[self].sprite.y += players[self].speed;
         } else {
-            player.sprite.setAnimation('Idle');
+            players[self].sprite.setAnimation('Idle');
         }
     }
 
+    players.forEach(function (player) {
+        if (player.username != login.info[0]) {
+            try {
+                player.sprite.x = peerState[player.username].x;
+                player.sprite.y = peerState[player.username].y;
+                player.sprite.setAnimation(peerState[player.username].animation);
+            } catch {
+                // console.log("peerState: ", peerState);
+            }
+        } else {
+            // share game state with signaling server & thus other connected clients
+            var ts = Date.now();
+            var msg = {
+                "type": 'game',
+                "ts": ts,
+                "username": player.username,
+                "character": player.character,
+                "x": player.sprite.x, 
+                "y": player.sprite.y,
+                "animation": player.sprite.currentAnimation,
+                "playerCount": peerState.length + 1
+            }
+            sendToServer(msg);
+        }
+    });
+
     // share game state with signaling server & thus other connected clients
-    var ts = Date.now();
-    var msg = {
-        "type": 'game',
-        "ts": ts,
-        "username": player.username,
-        "character": player.character,
-        "x": player.sprite.x, 
-        "y": player.sprite.y,
-        "animation": player.sprite.currentAnimation,
-        "playerCount": peerState.length + 1
-    }
-    sendToServer(msg);
+    // var ts = Date.now();
+    // var msg = {
+    //     "type": 'game',
+    //     "ts": ts,
+    //     "username": player.username,
+    //     "character": player.character,
+    //     "x": player.sprite.x, 
+    //     "y": player.sprite.y,
+    //     "animation": player.sprite.currentAnimation,
+    //     "playerCount": peerState.length + 1
+    // }
+    // sendToServer(msg);
 
     // updateBullets();
 
