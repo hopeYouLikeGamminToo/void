@@ -23,7 +23,7 @@ export function addPlayer() {
     let difference = playerList.filter(x => !activeList.includes(x)).values();
 
     for (const username of difference) {
-        let character = Math.random() < 0.5 ? "kraken" : "edward"
+        let character = Math.random() < 0.5 ? "kraken" : "glonky"
         player = new Player(app, game, username, character); // add more characters! 
         player.sprite.x = 200; // peerState[username].x;
         player.sprite.y = 200; // peerState[username].y;

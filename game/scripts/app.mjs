@@ -46,7 +46,7 @@ export let login;
 // 		.load(setup); // calling setup function after loading resources
 
 
-let assets = ["void", "spaceman", "kraken", "edward"];
+let assets = ["void", "spaceman", "kraken", "glonky"];
 for (let i = 0; i < assets.length; i++)  {
     loadCharacterAssets(assets[i]);    
 }
@@ -75,7 +75,7 @@ function setup() {
 
     login = new Login(app.renderer, start);
     chatbox = new Chatbox(app.renderer, game);
-    // player = new Player(app, game, null, 'edward'); // default to kraken for now
+    // player = new Player(app, game, null, 'glonky'); // default to kraken for now
     // player.position(window.outerWidth / 2, window.outerHeight / 2);
 
 	app.ticker.add(splashLoop);

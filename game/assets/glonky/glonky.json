@@ -1,5 +1,5 @@
 { "frames": {
-   "edward0": {
+   "glonky0": {
     "frame": { "x": 0, "y": 0, "w": 125, "h": 158 },
     "rotated": false,
     "trimmed": false,
@@ -7,7 +7,7 @@
     "sourceSize": { "w": 125, "h": 158 },
     "duration": 100
    },
-   "edward1": {
+   "glonky1": {
     "frame": { "x": 125, "y": 0, "w": 125, "h": 158 },
     "rotated": false,
     "trimmed": false,
@@ -15,7 +15,7 @@
     "sourceSize": { "w": 125, "h": 158 },
     "duration": 100
    },
-   "edward2": {
+   "glonky2": {
     "frame": { "x": 250, "y": 0, "w": 125, "h": 158 },
     "rotated": false,
     "trimmed": false,
@@ -23,7 +23,7 @@
     "sourceSize": { "w": 125, "h": 158 },
     "duration": 100
    },
-   "edward3": {
+   "glonky3": {
     "frame": { "x": 375, "y": 0, "w": 125, "h": 158 },
     "rotated": false,
     "trimmed": false,
@@ -31,7 +31,7 @@
     "sourceSize": { "w": 125, "h": 158 },
     "duration": 100
    },
-   "edward4": {
+   "glonky4": {
     "frame": { "x": 500, "y": 0, "w": 125, "h": 158 },
     "rotated": false,
     "trimmed": false,
@@ -39,7 +39,7 @@
     "sourceSize": { "w": 125, "h": 158 },
     "duration": 100
    },
-   "edward5": {
+   "glonky5": {
     "frame": { "x": 625, "y": 0, "w": 125, "h": 158 },
     "rotated": false,
     "trimmed": false,
@@ -47,7 +47,7 @@
     "sourceSize": { "w": 125, "h": 158 },
     "duration": 100
    },
-   "edward6": {
+   "glonky6": {
     "frame": { "x": 750, "y": 0, "w": 125, "h": 158 },
     "rotated": false,
     "trimmed": false,
@@ -55,7 +55,7 @@
     "sourceSize": { "w": 125, "h": 158 },
     "duration": 100
    },
-   "edward7": {
+   "glonky7": {
     "frame": { "x": 875, "y": 0, "w": 125, "h": 158 },
     "rotated": false,
     "trimmed": false,
@@ -63,7 +63,7 @@
     "sourceSize": { "w": 125, "h": 158 },
     "duration": 100
    },
-   "edward8": {
+   "glonky8": {
     "frame": { "x": 1000, "y": 0, "w": 125, "h": 158 },
     "rotated": false,
     "trimmed": false,
@@ -73,17 +73,17 @@
    }
  },
  "animations": {
-  "Idle": ["edward0"],
-  "RunRight": ["edward1", "edward2", "edward3","edward4"],
-  "RunLeft": ["edward5", "edward6", "edward7", "edward8"],
-  "Shoot": ["edward0"],
-  "Jump": ["edward0"],
-  "Duck": ["edward0"]
+  "Idle": ["glonky0"],
+  "RunRight": ["glonky1", "glonky2", "glonky3","glonky4"],
+  "RunLeft": ["glonky5", "glonky6", "glonky7", "glonky8"],
+  "Shoot": ["glonky0"],
+  "Jump": ["glonky0"],
+  "Duck": ["glonky0"]
 },
  "meta": {
   "app": "https://www.aseprite.org/",
   "version": "1.3-beta16-x64",
-  "image": "edward.png",
+  "image": "glonky.png",
   "format": "RGBA8888",
   "size": { "w": 1125, "h": 158 },
   "scale": "1",
@@ -93,7 +93,7 @@
    { "name": "run-left", "from": 5, "to": 8, "direction": "forward", "color": "#000000ff" }
   ],
   "layers": [
-   { "name": "edward", "opacity": 255, "blendMode": "normal" }
+   { "name": "glonky", "opacity": 255, "blendMode": "normal" }
   ],
   "slices": [
   ]

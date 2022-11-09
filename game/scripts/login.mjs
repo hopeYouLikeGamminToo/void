@@ -91,7 +91,7 @@ export class Login {
             "type": 'game',
             "ts": ts,
             "username": this.info[0],
-            "character": Math.random() < 0.5 ? "kraken" : "edward",
+            "character": Math.random() < 0.5 ? "kraken" : "glonky",
             "x": null, 
             "y": null,
             "animation": null,

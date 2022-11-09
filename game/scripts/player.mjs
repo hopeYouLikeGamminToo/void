@@ -15,8 +15,8 @@ export class Player {
             case "spaceman":
                 sprite = new MultiAnimatedSprite(resources.spaceman.spritesheet);
                 break;
-            case "edward":
-                sprite = new MultiAnimatedSprite(resources.edward.spritesheet);
+            case "glonky":
+                sprite = new MultiAnimatedSprite(resources.glonky.spritesheet);
                 break; 
             case "void":
                 sprite = new MultiAnimatedSprite(resources.void.spritesheet);
