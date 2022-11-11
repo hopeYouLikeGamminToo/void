@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "pixi-text-input": "^1.0.6",
+    "websocket": "^1.0.34"
+  }
+}
