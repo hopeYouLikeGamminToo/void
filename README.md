@@ -16,7 +16,7 @@ please continue to use node/vscode live server until the tea bug is fixed. <br/>
 Install tea: <br/>
 `sh <(curl tea.xyz)` <br/>
 
-Note: If you do not wish to install tea you can replace `sh <(curl tea.xyz)` for every instance of `tea` below. If tea is already installed, it uses it, if not it *doesn’t* install tea, a temporary sandbox is created. <br/> 
+Note: If you do not wish to install tea you can replace `sh <(curl tea.xyz)` for every instance of `tea` below. If tea is already installed, it uses it. If tea is not installed, then a temporary sandbox is created. <br/> 
 
 Navigate to the game directory: <br/>
 `cd tea-game`
