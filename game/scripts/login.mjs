@@ -67,7 +67,6 @@ export class Login {
     }
 
     submit(bypass) {
-        console.log("submitting login form");
         this.form.style.display = "none";
         this.form.blur();
         this.form.submit;
@@ -87,7 +86,7 @@ export class Login {
             this.wrappedForm.target.elements['remember'].checked = true;
             console.log("login bypassed");
         }
-        
+
         this.info.push(this.wrappedForm.target.elements['username'].value);
         this.info.push(this.wrappedForm.target.elements['password'].value);
         this.info.push(this.wrappedForm.target.elements['remember'].checked);

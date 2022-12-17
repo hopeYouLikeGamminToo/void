@@ -1,6 +1,7 @@
 import { Graphics } from './libs/pixi.mjs';
+import { engine, World, Body, Bodies } from './physics.mjs';
 
-
+// TODO: ALOT
 export class Map {
     constructor(app, stage, level) {
         // replace with load map fxn here
@@ -31,5 +32,32 @@ export class Map {
         this.platform3.x = app.screen.width / 4;
         this.platform3.y = app.screen.height / 1.3;
         stage.addChild(this.platform3);
+
+        this.platform1_body = Bodies.rectangle( this.platform1.x + 95, this.platform1.y - 75, this.platform1.width - 30, this.platform1.height, {
+            isStatic: true,  // no moving or rotatation
+            isSensor: false,  // enable collisions
+            // friction: 2,  // friction forces
+            // frictionStatic: 2,  // static friction
+            restitution: 0 // bounciness
+        });
+        this.platform2_body = Bodies.rectangle( this.platform2.x + 95, this.platform2.y - 75, this.platform2.width - 30, this.platform2.height, {
+            isStatic: true,  // no moving or rotatation
+            isSensor: false,  // enable collisions
+            // friction: 2,  // friction forces
+            // frictionStatic: 1,  // static friction
+            restitution: 0 // bounciness
+        });
+        this.platform3_body = Bodies.rectangle( this.platform3.x + 405, this.platform3.y - 75, this.platform3.width - 50, this.platform3.height, {
+            isStatic: true,  // no moving or rotatation
+            isSensor: false,  // enable collisions
+            // friction: 2,  // friction forces
+            // frictionStatic: 1,  // static friction
+            restitution: 0 // bounciness
+        });
+
+        console.log("platform2.position: ", this.platform2.position);
+        console.log("platform2_body.position: ", this.platform2_body.position);
+
+        World.add(engine.world, [this.platform1_body, this.platform2_body, this.platform3_body]);
     }
 }

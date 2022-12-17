@@ -1,10 +1,13 @@
 import { Application, Container, Loader, Sprite, SCALE_MODES, settings, } from './libs/pixi.mjs';
+// import * as Matter from "./libs/matter.min.mjs"; // this is not being nice, importing in index.html instead
 
-import { Player } from './player.mjs'
-import { Chatbox } from './chatbox.mjs'
-import { Login } from './login.mjs'
-import { splashLoop, gameLoop } from './game.mjs'
-import { playerList, sendToServer, log, connect, connection } from "./client.mjs";
+import { Player } from './player.mjs';
+import { Map } from './map.mjs';
+import { Chatbox } from './chatbox.mjs';
+import { Login } from './login.mjs';
+import { splashLoop, gameLoop } from './game.mjs';
+import { connect, playerList } from "./client.mjs";
+import { Engine, World, Body, Bodies } from './physics.mjs';
 
 const BYPASS_LOGIN = true;
 
@@ -19,12 +22,16 @@ export var app = new Application({
     width: window.outerWidth,
     height: window.outerHeight,
     backgroundColor: 0x202020,
-    autoDensity: true
+    autoDensity: true,
 });
 
 document.body.appendChild(app.view);
 
+console.log("app.width: ", app.screen.width);
+console.log("app.height: ", app.screen.height);
+
 export let ticker = app.ticker;
+export let screen = app.screen;
 
 // declare game scenes globally
 export let splash;
@@ -36,28 +43,15 @@ export let end;
 export let chatbox;
 export let login;
 
-// export player
-// export let player;
-
-// declare game objects globally
-// let title;
-// let triangle;
-// https://pixijs.download/v6.1.1/docs/PIXI.Loader.html 
-// Loader.shared
-// 		.add(['assets/void.gif'])
-// 		.add(['assets/triangle.jpeg'])
-// 		.load(setup); // calling setup function after loading resources
-
 app.loader.baseUrl = 'assets';
 let assets = ["void", "spaceman", "kraken", "glonky"];
 for (let i = 0; i < assets.length; i++)  {
     loadCharacterAssets(assets[i]);    
 }
-app.loader.add("bullet", "bullet/bullet.png")
-        // .add("something", "something/something.json").load();
+app.loader.add("bullet", "bullet/bullet.png");
+        // .add("something", "something/something.json")
 
 app.loader.load(setup);
-// preload assets
 
 function setup() {
     // initialize game scenes & set start.visible = true
@@ -90,6 +84,7 @@ function setup() {
 
         connect();
         login.submit(BYPASS_LOGIN);
+        // while (playerList.length == 0) {}
 
         app.ticker.add(gameLoop);
     } else {

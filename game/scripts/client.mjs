@@ -1,4 +1,4 @@
-import { addPlayer, peerState } from "./game.mjs";
+import { peerState } from "./game.mjs";
 import { chatbox } from "./app.mjs";
 
 // Get our hostname
