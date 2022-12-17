@@ -11,7 +11,7 @@ export class Login {
             event.preventDefault();
             this.submit();
         });
-        
+
         // style.css breaks fullscreen
         this.form.style.fontFamily = 'space';
         this.form.style.color = "#9A8FD9";
@@ -51,8 +51,8 @@ export class Login {
 
         this.wrappedForm = new ElementWrapper(this.form);
 
-        this.wrappedForm.x =  window.outerWidth / 2 - 200;
-        this.wrappedForm.y =  window.outerHeight / 2 - 100;
+        this.wrappedForm.x = window.outerWidth / 2 - 200;
+        this.wrappedForm.y = window.outerHeight / 2 - 100;
 
         // chatbox helper variables
         this.first_enter = true;
@@ -77,11 +77,11 @@ export class Login {
         // player.username = this.wrappedForm.target.elements['username'].value;
         // player.password = this.wrappedForm.target.elements['password'].value;
         // player.remember = this.wrappedForm.target.elements['remember'].checked;
-        
+
 
 
         if (bypass) {
-            this.wrappedForm.target.elements['username'].value = "developer";
+            this.wrappedForm.target.elements['username'].value = this.generateUsername();
             this.wrappedForm.target.elements['password'].value = "this doesnt matter until we have a database";
             this.wrappedForm.target.elements['remember'].checked = true;
             console.log("login bypassed");
@@ -90,7 +90,7 @@ export class Login {
         this.info.push(this.wrappedForm.target.elements['username'].value);
         this.info.push(this.wrappedForm.target.elements['password'].value);
         this.info.push(this.wrappedForm.target.elements['remember'].checked);
-        
+
 
         // this.info.push(player.username);
         // this.info.push(player.password);
@@ -102,17 +102,27 @@ export class Login {
             "ts": ts,
             "username": this.info[0],
             "character": Math.random() < 0.5 ? "kraken" : "glonky",
-            "x": null, 
+            "x": null,
             "y": null,
             "animation": null,
             "playerCount": 0
         }
         sendToServer(msg);
-        
+
         console.log("login.info: ", this.info)
         this.wrappedForm.target.value = [];
 
         start.visible = false;
         game.visible = true;
+    }
+
+    generateUsername() {
+        const adjectives = ['adorable', 'beautiful', 'charming', 'elegant', 'fancy', 'glamorous', 'handsome', 'magnificent', 'quaint', 'sparkling', 'witty'];
+        const nouns = ['beaver', 'crocodile', 'otter', 'dolphin', 'giraffe', 'koala', 'llama', 'panda', 'platypus', 'squirrel'];
+
+        const randomAdjective = adjectives[Math.floor(Math.random() * adjectives.length)];
+        const randomNoun = nouns[Math.floor(Math.random() * nouns.length)];
+
+        return `${randomAdjective}-${randomNoun}`;
     }
 }
