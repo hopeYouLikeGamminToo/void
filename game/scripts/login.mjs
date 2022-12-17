@@ -66,7 +66,8 @@ export class Login {
         this.stage.addChild(this.wrappedForm);
     }
 
-    submit() {
+    submit(bypass) {
+        console.log("submitting login form");
         this.form.style.display = "none";
         this.form.blur();
         this.form.submit;
@@ -77,10 +78,20 @@ export class Login {
         // player.username = this.wrappedForm.target.elements['username'].value;
         // player.password = this.wrappedForm.target.elements['password'].value;
         // player.remember = this.wrappedForm.target.elements['remember'].checked;
+        
 
+
+        if (bypass) {
+            this.wrappedForm.target.elements['username'].value = "developer";
+            this.wrappedForm.target.elements['password'].value = "this doesnt matter until we have a database";
+            this.wrappedForm.target.elements['remember'].checked = true;
+            console.log("login bypassed");
+        }
+        
         this.info.push(this.wrappedForm.target.elements['username'].value);
         this.info.push(this.wrappedForm.target.elements['password'].value);
         this.info.push(this.wrappedForm.target.elements['remember'].checked);
+        
 
         // this.info.push(player.username);
         // this.info.push(player.password);

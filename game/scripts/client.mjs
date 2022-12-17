@@ -34,7 +34,7 @@ var mediaConstraints = {
 };
 
 var username = null;
-export var playerList = [];
+var playerList = [];
 var targetUsername = null;      // To store username of other peer
 var myPeerConnection = null;    // RTCPeerConnection
 var transceiver = null;         // RTCRtpTransceiver
@@ -657,4 +657,4 @@ function reportError(errMessage) {
     log_error(`Error ${errMessage.name}: ${errMessage.message}`);
 }
 
-export { username, clientID, sendToServer, log }; 
+export { username, clientID, connect, connection, sendToServer, log, playerList }; 

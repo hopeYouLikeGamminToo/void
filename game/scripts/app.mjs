@@ -3,7 +3,10 @@ import { Application, Container, Loader, Sprite, SCALE_MODES, settings, } from '
 import { Player } from './player.mjs'
 import { Chatbox } from './chatbox.mjs'
 import { Login } from './login.mjs'
-import { splashLoop } from './game.mjs'
+import { splashLoop, gameLoop } from './game.mjs'
+import { playerList, sendToServer, log, connect, connection } from "./client.mjs";
+
+const BYPASS_LOGIN = true;
 
 // settings.RESOLUTION = window.devicePixelRatio;
 settings.SCALE_MODE = SCALE_MODES.NEAREST;
@@ -60,20 +63,17 @@ function setup() {
     // initialize game scenes & set start.visible = true
     splash = new Container();
     app.stage.addChild(splash);
-    splash.visible = true;
 
     start = new Container();
     app.stage.addChild(start);
-    start.visible = false;
 
     game = new Container();
     app.stage.addChild(game);
-    game.visible = false;
 
     end = new Container();
     app.stage.addChild(end);
-    end.visible = false;
 
+    // TODO: should create separate class for misc. objects & platforms in game
     let logo = new Player(app, splash, null, 'void')
     logo.position(window.outerWidth / 2, window.outerHeight / 2);
 
@@ -82,7 +82,23 @@ function setup() {
     // player = new Player(app, game, null, 'glonky'); // default to kraken for now
     // player.position(window.outerWidth / 2, window.outerHeight / 2);
 
-	app.ticker.add(splashLoop);
+    if (BYPASS_LOGIN) {
+        start.visible = false;
+        splash.visible = false;
+        game.visible = true;
+        end.visible = false;
+
+        connect();
+        login.submit(BYPASS_LOGIN);
+
+        app.ticker.add(gameLoop);
+    } else {
+        splash.visible = true;
+        start.visible = false;
+        game.visible = false;
+        end.visible = false;
+        app.ticker.add(splashLoop);
+    }
 }
 
 // this needs some rework > should not have to edit json file to load assets

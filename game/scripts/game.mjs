@@ -51,8 +51,9 @@ export function startLoop() {
     }
 }
 
-export function gameLoop() {
+export async function gameLoop() {
     frame += 1;
+
     if (frame == 1) {
         console.log("game stage");
         map = new Map(app, game, 0);
