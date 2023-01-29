@@ -1,6 +1,6 @@
 const MATTER_RENDER = false;
 
-// Matter Modules
+// Alias Matter Modules
 export const Engine = Matter.Engine;
 export const World = Matter.World;
 export const Body = Matter.Body;
@@ -15,7 +15,7 @@ export const Runner = Matter.Runner;
 // Matter Engine
 export const engine = Engine.create();
 engine.world.gravity.x = 0; // Horizontal gravity
-engine.world.gravity.y = 5; // Vertical gravity
+engine.world.gravity.y = 7; // Vertical gravity
 
 if (MATTER_RENDER) {
     // create renderer

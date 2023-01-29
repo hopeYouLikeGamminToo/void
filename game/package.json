@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "keyboardjs": "^2.7.0",
     "pixi-text-input": "^1.0.6",
     "stats": "^1.0.0",
     "webrtc-adapter": "^8.2.0",

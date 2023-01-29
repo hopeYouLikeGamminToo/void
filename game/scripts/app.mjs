@@ -77,8 +77,8 @@ function setup() {
     // player.position(window.outerWidth / 2, window.outerHeight / 2);
 
     if (BYPASS_LOGIN) {
-        start.visible = false;
         splash.visible = false;
+        start.visible = false;
         game.visible = true;
         end.visible = false;
 

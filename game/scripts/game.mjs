@@ -60,7 +60,7 @@ export async function gameLoop() {
         map = new Map(app, game, 0);
 
         if (playerList.length == 0) {
-            frame -=1;
+            frame -= 1;
         } else {
             self = playerList.indexOf(login.info[0]);
         }
@@ -68,13 +68,13 @@ export async function gameLoop() {
 
     frame += 1;
 
-    if (frame > 30) { 
-        frame = 1; 
+    if (frame > 20) {
+        frame = 1;
         players[self].jumping = false;
     }
 
     if (playerList.length > activeList.length) {
-    // if (Object.keys(peerState).length > activeList.length) {
+        // if (Object.keys(peerState).length > activeList.length) {
         playerCount += 1
         addPlayer();
     } else if (playerList.length < activeList.length) {
@@ -82,7 +82,7 @@ export async function gameLoop() {
     }
 
     players[self].sprite.position = players[self].body.position;
-    // players[self].sprite.rotation = players[self].body.angle;
+    players[self].sprite.rotation = players[self].body.angle;
 
     // console.log("players[self].sprite.position: ", players[self].sprite.position);
     // console.log("players[self].body.position: ", players[self].body.position);
@@ -94,7 +94,8 @@ export async function gameLoop() {
                 createBullet("keyboard");
             }
             players[self].sprite.setAnimation('Shoot');
-
+            delete input.keyboard['click'];
+            
         } else if (input.keyboard['Space']) {
             // console.log("space!");
             // player.setAnimation('Jump');
@@ -128,17 +129,39 @@ export async function gameLoop() {
             // console.log("duck!");
             players[self].sprite.setAnimation('Duck');
             // players[self].sprite.y += players[self].speed;
-        } else {
+        } else if (input.keyboard.length == 0) {
             players[self].sprite.setAnimation('Idle');
         }
     }
 
     if (input.type == "gamepad" && activeList.length > 0) {
+        // console.log("input.gamepad: ", input.gamepad);
+        // let pressed = input.gamepad.update();
+        // console.log("pressed: ", pressed);
+
+        // if (input.gamepad.axesStatus[0].x > 0.5) {
+        //     console.log("run right!");
+        //     // this.player.angle += 3;
+        //     // this.turret.angle += 3;
+        // }
+
+        // if (input.gamepad.turbo) {
+        //     if (input.gamepad.buttonPressed("A", "hold")) {
+        //         console.log("A held!")
+        //         // this.turbo_fire();
+        //     }
+        //     if (input.gamepad.buttonPressed("B")) {
+        //         console.log("B pressed!")
+        //         // this.managePause();
+        //     }
+        // }
+
+
         var gamepads = navigator.getGamepads();
         if (gamepads[0].buttons.some((elem) => elem.pressed == 1) || gamepads[0].axes.some((elem) => elem >= 0.2) || gamepads[0].axes.some((elem) => elem <= -0.2)) {
             console.log(gamepads[0]);
         }
-        
+
         if (gamepads[0].buttons[7].value) {
             if (players[self].sprite.animation != "Shoot") {
                 createBullet("gamepad");
@@ -195,7 +218,7 @@ export async function gameLoop() {
                 "ts": ts,
                 "username": player.username,
                 "character": player.character,
-                "x": player.sprite.x, 
+                "x": player.sprite.x,
                 "y": player.sprite.y,
                 "animation": player.sprite.currentAnimation,
                 "playerCount": peerState.length + 1
@@ -231,7 +254,7 @@ export function addPlayer() {
         // World.addBody(engine.World, [player.body]) // ; >> doing this in player.mjs
         activeList.push(username);
         players.push(player)
-      }
+    }
 }
 
 // should this be in another file?
@@ -240,18 +263,21 @@ function createBullet(input_type) {
     var direction = new Point();
 
     // this bit doesn't work but was intended to make bullet direction horizontal if input type is the gamepad
-    if (input_type == "keyboard") {
-        direction.x = input.mouse.x - players[self].sprite.x;
-        direction.y = input.mouse.y - players[self].sprite.y;
-    } else {
-        if (players[self].character == "kraken") {
-            direction.x = players[self].sprite.x + 50;
-            direction.y = players[self].sprite.y - 250;
-        } else { //(players[self].character == "glonky")
-            direction.x = players[self].sprite.x + 50;
-            direction.y = players[self].sprite.y - 400;
-        }
-    }
+    // if (input_type == "keyboard") {
+    //     direction.x = input.mouse.x - players[self].sprite.x;
+    //     direction.y = input.mouse.y - players[self].sprite.y;
+    // } else {
+    //     if (players[self].character == "kraken") {
+    //         direction.x = players[self].sprite.x + 50;
+    //         direction.y = players[self].sprite.y - 250;
+    //     } else { //(players[self].character == "glonky")
+    //         direction.x = players[self].sprite.x + 50;
+    //         direction.y = players[self].sprite.y - 400;
+    //     }
+    // }
+
+    direction.x = 1; // players[self].sprite.x + 1;
+    direction.y = 0; // players[self].sprite.y + 1;
 
     console.log("direction: ", [direction.x, direction.y]);
 
@@ -283,7 +309,7 @@ function updateBullets() {
         bullet.x += bullet.direction.x * speed;
         bullet.y += bullet.direction.y * speed;
         // console.log("bullet direction: ", [bullet.x, bullet.y]);
-        
+
         //Hit detection here
 
         if (bullet.y < 0) {

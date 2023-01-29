@@ -67,9 +67,9 @@ export class Player {
         // this._health = 100;
         // this._position = position;
         this.speed = 5;
-        this.run_right = Vector.create(0.04, 0);
-        this.run_left = Vector.create(-0.04, 0);
-        this.jump = Vector.create(0, -0.07); // Vector.create(this.body.x, this.body.y + 100);
+        this.run_right = Vector.create(0.045, 0);
+        this.run_left = Vector.create(-0.045, 0);
+        this.jump = Vector.create(0, -0.085); // Vector.create(this.body.x, this.body.y + 100);
         this.jumping = false;
 
 
@@ -85,6 +85,7 @@ export class Player {
         this.sprite.y = y - (this.sprite.height / 2);
 
         if (this.body) {
+            console.log("this.body.getGlobalPosition(): ", this.body.getGlobalPosition());
             this.body.position = this.sprite.position;
         }
     }

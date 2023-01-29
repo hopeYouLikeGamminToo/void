@@ -33,21 +33,26 @@ export class Map {
         this.platform3.y = app.screen.height / 1.3;
         stage.addChild(this.platform3);
 
-        this.platform1_body = Bodies.rectangle( this.platform1.x + 95, this.platform1.y - 75, this.platform1.width - 30, this.platform1.height, {
+        // should be able to find the matter body offsets dynamically...
+        // matter js position is the center of the body
+        // pixi position is the top left corner of the body
+        // still doesn't seem to be working correctly though...
+
+        this.platform1_body = Bodies.rectangle( this.platform1.x + 95, this.platform1.y - 70, this.platform1.width - 30, this.platform1.height, {
             isStatic: true,  // no moving or rotatation
             isSensor: false,  // enable collisions
             // friction: 2,  // friction forces
             // frictionStatic: 2,  // static friction
             restitution: 0 // bounciness
         });
-        this.platform2_body = Bodies.rectangle( this.platform2.x + 95, this.platform2.y - 75, this.platform2.width - 30, this.platform2.height, {
+        this.platform2_body = Bodies.rectangle( this.platform2.x + 95, this.platform2.y - 70, this.platform2.width - 30, this.platform2.height, {
             isStatic: true,  // no moving or rotatation
             isSensor: false,  // enable collisions
             // friction: 2,  // friction forces
             // frictionStatic: 1,  // static friction
             restitution: 0 // bounciness
         });
-        this.platform3_body = Bodies.rectangle( this.platform3.x + 405, this.platform3.y - 75, this.platform3.width - 50, this.platform3.height, {
+        this.platform3_body = Bodies.rectangle( this.platform3.x + 405, this.platform3.y - 70, this.platform3.width - 50, this.platform3.height, {
             isStatic: true,  // no moving or rotatation
             isSensor: false,  // enable collisions
             // friction: 2,  // friction forces
