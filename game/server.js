@@ -220,7 +220,7 @@ wsServer.on('request', function(request) {
   // to the server.
   connection.on('message', function(message) {
     if (message.type === 'utf8') {
-      log("Received Message: " + message.utf8Data);
+      // log("Received Message: " + message.utf8Data);
 
       // Process incoming data.
       var sendToClients = true;

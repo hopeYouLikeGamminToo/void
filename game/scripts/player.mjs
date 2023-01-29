@@ -1,23 +1,24 @@
-import {AnimatedSprite, Container, Sprite, Texture} from './libs/pixi.mjs';
+import { AnimatedSprite, Container, Sprite, Texture } from './libs/pixi.mjs';
+import { engine, World, Bodies, Vector } from './physics.mjs';
 
 export class Player {
     constructor(app, stage, username, character) {
         if (username != null) {
             console.log(`assigning ${character} to ${username}`);
         }
-        
+
         let sprite;
         let resources = app.loader.resources;
         switch (character) {
             case "kraken":
-                sprite  = new MultiAnimatedSprite(resources.kraken.spritesheet);
+                sprite = new MultiAnimatedSprite(resources.kraken.spritesheet);
                 break;
             case "spaceman":
                 sprite = new MultiAnimatedSprite(resources.spaceman.spritesheet);
                 break;
             case "glonky":
                 sprite = new MultiAnimatedSprite(resources.glonky.spritesheet);
-                break; 
+                break;
             case "void":
                 sprite = new MultiAnimatedSprite(resources.void.spritesheet);
                 // texture = Texture.from("./assets/void.gif");
@@ -30,8 +31,31 @@ export class Player {
         // super(player);
         // would be nice to use super here...
         // need to figure out how to extend player class
-        this.sprite = sprite; 
-        
+        this.sprite = sprite;
+
+        if  (character != "void") {
+            this.body = Bodies.circle(
+                250 - (this.sprite.width / 2),
+                250 - (this.sprite.width / 2),
+                this.sprite.width / 2,
+                // this.sprite.height,
+                {
+                    // isSensor: false,
+                    density: 1.078,
+                    frictionAir: 0.75,
+                    friction: 2,
+                    frictionStatic: 2,
+                    restitution: 0, 
+                    mass: 30,
+                    // damping: 5,
+                    // gravityScale: 2  // Set the gravity scale to a non-zero value to enable the sprite to be affected by gravity
+                }
+            );
+            World.addBody(engine.world, this.body);
+            console.log("player.body: ", this.body);
+            console.log("engine: ", engine);
+        }
+
         this.username = username;
         this.password = null;
         this.remember = null;
@@ -43,8 +67,12 @@ export class Player {
         // this._characer = character;
         // this._health = 100;
         // this._position = position;
-        this.speed = 5;
-        this.jump = 2;
+        this.run_right = Vector.create(0.6, 0);
+        this.run_left = Vector.create(-0.6, 0);
+        this.jump = Vector.create(0, -1.2); // Vector.create(this.body.x, this.body.y + 100);
+
+        this.movement = "";
+        // this.jumpDuration = 500; // ms
 
         // this will be dependent on character, specials, wearables, armor, etc.
         // this.melee_strength = 10;
@@ -54,8 +82,13 @@ export class Player {
     }
 
     position(x, y) {
-        this.sprite.x = x  - (this.sprite.width / 2);
+        this.sprite.x = x - (this.sprite.width / 2);
         this.sprite.y = y - (this.sprite.height / 2);
+
+        if (this.body) {
+            console.log("this.body.getGlobalPosition(): ", this.body.getGlobalPosition());
+            this.body.position = this.sprite.position;
+        }
     }
 
 }
@@ -113,4 +146,3 @@ var MultiAnimatedSprite = /** @class */ (function (_super) {
     };
     return MultiAnimatedSprite;
 }(Container));
- 

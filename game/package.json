@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "matter-js": "^0.18.0",
+    "keyboardjs": "^2.7.0",
     "pixi-text-input": "^1.0.6",
     "stats": "^1.0.0",
     "webrtc-adapter": "^8.2.0",
