@@ -15,7 +15,7 @@ export const Runner = Matter.Runner;
 // Matter Engine
 export const engine = Engine.create();
 engine.world.gravity.x = 0; // Horizontal gravity
-engine.world.gravity.y = 7; // Vertical gravity
+engine.world.gravity.y = 15; // Vertical gravity
 
 if (MATTER_RENDER) {
     // create renderer

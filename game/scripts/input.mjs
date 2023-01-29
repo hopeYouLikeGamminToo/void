@@ -1,6 +1,7 @@
 
 import { splash, start, game, end, chatbox } from "./app.mjs";
-// import { login } from "./game.mjs";
+import { self, players } from "./game.mjs";
+import { Body } from "./physics.mjs";
 
 // keyboard stuff
 export let enterCount = 0;
@@ -14,63 +15,148 @@ export let mouse = {
     'angle': 0
 };
 
-keystrokes.bindKey('a', {
-    onPressed: () => console.log('You pressed "a"'),
-    onPressedWithRepeat: () => console.log('You\'re pressing "a"'),
-    onReleased: () => console.log('You released "a"'),
+// spacebar
+keystrokes.bindKey(' ', {
+    onPressed: () => console.log('You pressed "spacebar"'),
+    onPressedWithRepeat: () => console.log('You\'re pressing "spacebar"'),
+    onReleased: () => console.log('You released "spacebar"'),
 })
 
-export let keyboard = [];
+keystrokes.bindKey('Enter', {
+    onPressed: () => console.log('You pressed "enter"'),
+    onPressedWithRepeat: () => console.log('You\'re pressing "enter"'),
+    onReleased: () => console.log('You released "enter"'),
+})
 
-document.body.onkeydown = function (e) {
-    console.log("onkeydown: ", e.code);
-    keyboard[e.code] = true;
-}
+// let jumpTimeout = null;
+keystrokes.bindKey('w', {
+    onPressed: () => {
+        players[self].movement = "jumping";
+        jumpTimeout = setTimeout(() => {
+            players[self].movement = "";
+        }, 400);
+    },
+    onPressedWithRepeat: () => {
+        console.log('w');
+    },
+    onReleased: () => {
+        // clearTimeout(jumpTimeout);
+        players[self].movement = "";
+    },
+})
 
-document.body.onkeyup = function (e) {
-    // console.log("onkeyup: ", e.code);
+keystrokes.bindKeyCombo('w+a', {
+    onPressed: () => {
+        players[self].movement = "jumpingLeft";
+    },
+    onPressedWithRepeat: () => {
+        console.log('w+a');
+    },
+    onReleased: () => {
+        players[self].movement = "";
+    },
+})
 
-    if (e.code == "Space") {
-        // console.log("space!");
-    }
+keystrokes.bindKeyCombo('w+d', {
+    onPressed: () => {
+        players[self].movement = "jumpingRight";
+    },
+    onPressedWithRepeat: () => {
+        console.log('w+d');
+    },
+    onReleased: () => {
+        players[self].movement = "";
+    },
+})
 
-    if (e.code == "Enter") {
-        if (enterCount == 0) {
-            if (splash.visible) {
-                // chatbox.inputMessage();
-                console.log("splash.visible");
-            } else if (start.visible) {
-                enterCount = -1;
-                // login.submit(); // should submit with button only here...
-                // start.visible = false;
-                // game.visible = true;
-            } else if (game.visible) {
-                chatbox.inputMessage();
-            } else if (end.visible) {
-                console.log("end.visible");
-            } else {
-                console.log("enterCount = ", enterCount, ", but not sure what to do...")
-            }
-            // chatbox.inputMessage();
-        }
-        if (enterCount >= 1) {
-            if (splash.visible) {
-                // chatbox.inputMessage();
-                console.log("splash.visible");
-            } else if (start.visible) {
-                // login.submit(); // should submit with button only here...
-            } else if (game.visible) {
-                enterCount = chatbox.submitMessage(enterCount);
-            } else if (end.visible) {
-                console.log("end.visible");
-            } else {
-                console.log("enterCount = ", enterCount, ", but not sure what to do...")
-            }
-        }
-        enterCount += 1;
-    }
-    delete keyboard[e.code];
-};
+keystrokes.bindKey('a', {
+    onPressed: () => {
+        players[self].movement = "runningLeft";
+    },
+    onPressedWithRepeat: () => {
+        console.log('a');
+    },
+    onReleased: () => {
+        players[self].movement = "";
+    },
+})
+
+keystrokes.bindKey('d', {
+    onPressed: () => {
+        players[self].movement = "runningRight";
+    },
+    onPressedWithRepeat: () => {
+        console.log('d');
+    },
+    onReleased: () => {
+        players[self].movement = "";
+    },
+})
+
+keystrokes.bindKey('s', {
+    onPressed: () => {
+        players[self].movement = "ducking";
+    },
+    onPressedWithRepeat: () => {
+        console.log('s');
+    },
+    onReleased: () => {
+        players[self].movement = "";
+    },
+})
+
+
+// export let keyboard = [];
+
+// document.body.onkeydown = function (e) {
+//     console.log("onkeydown: ", e.code);
+//     keyboard[e.code] = true;
+// }
+
+// document.body.onkeyup = function (e) {
+//     // console.log("onkeyup: ", e.code);
+
+//     if (e.code == "Space") {
+//         // console.log("space!");
+//     }
+
+//     if (e.code == "Enter") {
+//         if (enterCount == 0) {
+//             if (splash.visible) {
+//                 // chatbox.inputMessage();
+//                 console.log("splash.visible");
+//             } else if (start.visible) {
+//                 enterCount = -1;
+//                 // login.submit(); // should submit with button only here...
+//                 // start.visible = false;
+//                 // game.visible = true;
+//             } else if (game.visible) {
+//                 chatbox.inputMessage();
+//             } else if (end.visible) {
+//                 console.log("end.visible");
+//             } else {
+//                 console.log("enterCount = ", enterCount, ", but not sure what to do...")
+//             }
+//             // chatbox.inputMessage();
+//         }
+//         if (enterCount >= 1) {
+//             if (splash.visible) {
+//                 // chatbox.inputMessage();
+//                 console.log("splash.visible");
+//             } else if (start.visible) {
+//                 // login.submit(); // should submit with button only here...
+//             } else if (game.visible) {
+//                 enterCount = chatbox.submitMessage(enterCount);
+//             } else if (end.visible) {
+//                 console.log("end.visible");
+//             } else {
+//                 console.log("enterCount = ", enterCount, ", but not sure what to do...")
+//             }
+//         }
+//         enterCount += 1;
+//     }
+//     delete keyboard[e.code];
+// };
 
 document.body.onmousedown = function (e) {
     // console.log("onmousedown: ", e.type);

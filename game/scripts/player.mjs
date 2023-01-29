@@ -40,13 +40,14 @@ export class Player {
                 this.sprite.width / 2,
                 // this.sprite.height,
                 {
-                    isSensor: false,
-                    density: 0.25,
-                    frictionAir: 0.2,
-                    friction: 0.12,  // Set the friction to a non-zero value to enable friction forces
-                    frictionStatic: 0.8,  // Set the static friction to a non-zero value to enable static friction
-                    restitution: 0,  // Set the restitution to a low value to enable bounciness
-                    mass: 6,  // Set the mass to a non-zero value to enable the sprite to be affected by forces
+                    // isSensor: false,
+                    density: 1.078,
+                    frictionAir: 0.75,
+                    friction: 2,
+                    frictionStatic: 2,
+                    restitution: 0, 
+                    mass: 30,
+                    // damping: 5,
                     // gravityScale: 2  // Set the gravity scale to a non-zero value to enable the sprite to be affected by gravity
                 }
             );
@@ -66,12 +67,12 @@ export class Player {
         // this._characer = character;
         // this._health = 100;
         // this._position = position;
-        this.speed = 5;
-        this.run_right = Vector.create(0.045, 0);
-        this.run_left = Vector.create(-0.045, 0);
-        this.jump = Vector.create(0, -0.085); // Vector.create(this.body.x, this.body.y + 100);
-        this.jumping = false;
+        this.run_right = Vector.create(0.6, 0);
+        this.run_left = Vector.create(-0.6, 0);
+        this.jump = Vector.create(0, -1.2); // Vector.create(this.body.x, this.body.y + 100);
 
+        this.movement = "";
+        // this.jumpDuration = 500; // ms
 
         // this will be dependent on character, specials, wearables, armor, etc.
         // this.melee_strength = 10;

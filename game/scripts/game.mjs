@@ -18,7 +18,7 @@ let playerCount = 0;
 let activeList = [];
 let player;
 let map;
-let players = [];
+export let players = [];
 var gravity = 7;
 
 
@@ -68,9 +68,9 @@ export async function gameLoop() {
 
     frame += 1;
 
-    if (frame > 20) {
+    if (frame > 60) {
         frame = 1;
-        players[self].jumping = false;
+        // players[self].jumping = false;
     }
 
     if (playerList.length > activeList.length) {
@@ -84,55 +84,91 @@ export async function gameLoop() {
     players[self].sprite.position = players[self].body.position;
     players[self].sprite.rotation = players[self].body.angle;
 
+    switch (players[self].movement) {
+        case "jumping":
+            players[self].sprite.setAnimation('Jump');
+            Body.applyForce(players[self].body, players[self].body.position, players[self].jump);
+            break;
+        case "jumpingLeft":
+            players[self].sprite.setAnimation('Jump');
+            Body.applyForce(players[self].body, players[self].body.position, players[self].jump);
+            Body.applyForce(players[self].body, players[self].body.position, players[self].run_left);
+            break;
+        case "jumpingRight":
+            players[self].sprite.setAnimation('Jump');
+            Body.applyForce(players[self].body, players[self].body.position, players[self].jump);
+            Body.applyForce(players[self].body, players[self].body.position, players[self].run_right);
+            break;
+        case "runningRight":
+            players[self].sprite.setAnimation('RunRight');
+            Body.applyForce(players[self].body, players[self].body.position, players[self].run_right);
+            break;
+        case "runningLeft":
+            players[self].sprite.setAnimation('RunLeft');
+            Body.applyForce(players[self].body, players[self].body.position, players[self].run_left);
+            break;
+        default:
+            players[self].sprite.setAnimation('Idle');
+    }
+
+    // if (players[self].jumping) {
+    //     players[self].sprite.setAnimation('Jump');
+    //     Body.applyForce(players[self].body, players[self].body.position, players[self].jump);
+    // } else if {
+
+    // } {
+    //     players[self].sprite.setAnimation('Idle');
+    // }
+
     // console.log("players[self].sprite.position: ", players[self].sprite.position);
     // console.log("players[self].body.position: ", players[self].body.position);
 
-    if (input.type == 'keyboard' && activeList.length > 0) { // keyboard
-        if (input.keyboard['click']) {
-            // console.log("shoot!");
-            if (players[self].sprite.animation != "Shoot") {
-                createBullet("keyboard");
-            }
-            players[self].sprite.setAnimation('Shoot');
-            delete input.keyboard['click'];
+    // if (input.type == 'keyboard' && activeList.length > 0) { // keyboard
+    //     if (input.keyboard['click']) {
+    //         // console.log("shoot!");
+    //         if (players[self].sprite.animation != "Shoot") {
+    //             createBullet("keyboard");
+    //         }
+    //         players[self].sprite.setAnimation('Shoot');
+    //         delete input.keyboard['click'];
             
-        } else if (input.keyboard['Space']) {
-            // console.log("space!");
-            // player.setAnimation('Jump');
-        } else if (input.keyboard["KeyW"] || players[self].jumping) {
-            // console.log("jump!");
-            players[self].jumping = true;
-            players[self].sprite.setAnimation('Jump');
-            // Body.setVelocity(players[self].body, players[self].jump);
-            Body.applyForce(players[self].body, players[self].body.position, players[self].jump);
+    //     } else if (input.keyboard['Space']) {
+    //         // console.log("space!");
+    //         // player.setAnimation('Jump');
+    //     } else if (input.keyboard["KeyW"] || players[self].jumping) {
+    //         // console.log("jump!");
+    //         players[self].jumping = true;
+    //         players[self].sprite.setAnimation('Jump');
+    //         // Body.setVelocity(players[self].body, players[self].jump);
+    //         Body.applyForce(players[self].body, players[self].body.position, players[self].jump);
 
-            // players[self].sprite.y -= players[self].speed + players[self].jump + gravity;
-            if (input.keyboard["KeyA"]) {
-                // players[self].sprite.x -= players[self].speed;
-                Body.applyForce(players[self].body, players[self].body.position, players[self].run_left);
-            } else if (input.keyboard["KeyD"]) {
-                // players[self].sprite.x += players[self].speed;
-                Body.applyForce(players[self].body, players[self].body.position, players[self].run_right);
-            }
-        } else if (input.keyboard["KeyA"]) {
-            // console.log("run left!");
-            players[self].sprite.setAnimation('RunLeft');
-            Body.applyForce(players[self].body, players[self].body.position, players[self].run_left);
-            // players[self].sprite.x -= players[self].speed;
-        } else if (input.keyboard["KeyD"]) {
-            // console.log("run right!");
-            players[self].sprite.setAnimation('RunRight');
-            Body.applyForce(players[self].body, players[self].body.position, players[self].run_right);
-            // players[self].sprite.x += players[self].speed;
-        } else if (input.keyboard["KeyS"]) {
-            // if touching platform > duck, else accelerate
-            // console.log("duck!");
-            players[self].sprite.setAnimation('Duck');
-            // players[self].sprite.y += players[self].speed;
-        } else if (input.keyboard.length == 0) {
-            players[self].sprite.setAnimation('Idle');
-        }
-    }
+    //         // players[self].sprite.y -= players[self].speed + players[self].jump + gravity;
+    //         if (input.keyboard["KeyA"]) {
+    //             // players[self].sprite.x -= players[self].speed;
+    //             Body.applyForce(players[self].body, players[self].body.position, players[self].run_left);
+    //         } else if (input.keyboard["KeyD"]) {
+    //             // players[self].sprite.x += players[self].speed;
+    //             Body.applyForce(players[self].body, players[self].body.position, players[self].run_right);
+    //         }
+    //     } else if (input.keyboard["KeyA"]) {
+    //         // console.log("run left!");
+    //         players[self].sprite.setAnimation('RunLeft');
+    //         Body.applyForce(players[self].body, players[self].body.position, players[self].run_left);
+    //         // players[self].sprite.x -= players[self].speed;
+    //     } else if (input.keyboard["KeyD"]) {
+    //         // console.log("run right!");
+    //         players[self].sprite.setAnimation('RunRight');
+    //         Body.applyForce(players[self].body, players[self].body.position, players[self].run_right);
+    //         // players[self].sprite.x += players[self].speed;
+    //     } else if (input.keyboard["KeyS"]) {
+    //         // if touching platform > duck, else accelerate
+    //         // console.log("duck!");
+    //         players[self].sprite.setAnimation('Duck');
+    //         // players[self].sprite.y += players[self].speed;
+    //     } else if (input.keyboard.length == 0) {
+    //         players[self].sprite.setAnimation('Idle');
+    //     }
+    // }
 
     if (input.type == "gamepad" && activeList.length > 0) {
         // console.log("input.gamepad: ", input.gamepad);
