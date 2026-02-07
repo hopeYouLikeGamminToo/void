@@ -102,6 +102,11 @@ export async function gameLoop() {
         hud.updateHealth(players[0], players[1]);
     }
 
+    // Ensure self player exists before updating
+    if (self === undefined || !players[self]) {
+        return;
+    }
+
     players[self].sprite.position = players[self].body.position;
     players[self].sprite.rotation = players[self].body.angle;
     
@@ -195,29 +200,9 @@ export async function gameLoop() {
     // }
 
     if (input.type == "gamepad" && activeList.length > 0) {
-        // console.log("input.gamepad: ", input.gamepad);
-        // let pressed = input.gamepad.update();
-        // console.log("pressed: ", pressed);
-
-        // if (input.gamepad.axesStatus[0].x > 0.5) {
-        //     console.log("run right!");
-        //     // this.player.angle += 3;
-        //     // this.turret.angle += 3;
-        // }
-
-        // if (input.gamepad.turbo) {
-        //     if (input.gamepad.buttonPressed("A", "hold")) {
-        //         console.log("A held!")
-        //         // this.turbo_fire();
-        //     }
-        //     if (input.gamepad.buttonPressed("B")) {
-        //         console.log("B pressed!")
-        //         // this.managePause();
-        //     }
-        // }
-
-
         var gamepads = navigator.getGamepads();
+        if (!gamepads || !gamepads[0]) return; // No gamepad connected
+        
         if (gamepads[0].buttons.some((elem) => elem.pressed == 1) || gamepads[0].axes.some((elem) => elem >= 0.2) || gamepads[0].axes.some((elem) => elem <= -0.2)) {
             console.log(gamepads[0]);
         }
