@@ -1,12 +1,29 @@
-<p float="left">
-  <img src="./game/assets/glonky/glonky-headshot-transparent.png" width="15%" />
-  <img src="./game/assets/void/void.gif" width="35%" /> 
-  <img src="./game/assets/kraken/kraken-headshot-transparent.png" width="20%" />
-</p>
-
 # void - 2D Fighting Game
 
 A browser-based 2-player fighting game inspired by Super Smash Bros, built with PixiJS and Matter.js.
+
+## ✨ New UI Flow (v2.0)
+
+The game now features a complete, professional UI flow:
+
+```
+Splash Screen → Login → Main Menu → Character Select → Matchmaking → Game
+```
+
+### UI Features
+- **Splash Screen**: Animated intro (2.5 seconds)
+- **Login Screen**: Username/password or guest login
+- **Main Menu**: Quick Play, Settings, Credits, Logout
+- **Character Select**: Choose from 4 characters with stats display
+- **Matchmaking Lobby**: Ready system with countdown
+- **Game Screen**: Full combat with pause menu (ESC)
+- **Navigation**: Full back button support throughout
+
+### Navigation
+- **Arrow Keys / WASD**: Navigate menus
+- **ENTER / SPACE**: Select/Confirm
+- **ESC**: Go back / Pause game
+- **Gamepad Support**: Coming soon for menus
 
 ## Features (v1.0)
 
@@ -31,37 +48,53 @@ A browser-based 2-player fighting game inspired by Super Smash Bros, built with 
 
 ## Getting Started
 
-NOTICE: <br/>
-There is an issue when adding multiple players & serving with tea <br/>
-please continue to use node/vscode live server until the tea bug is fixed. <br/>
-`node server.js` <br/>
-`vscode live server > index.html`
+### Prerequisites
+- Node.js (v14 or higher)
+- Modern web browser (Chrome, Firefox, Safari, Edge)
+- Optional: Gamepad/controller
 
-### Quick Start (Recommended)
+### Quick Start
 
-1. Navigate to the game directory:
+1. **Clone and navigate:**
 ```bash
-cd game
+git clone <repository-url>
+cd void/game
 ```
 
-2. Install dependencies:
+2. **Install dependencies:**
 ```bash
 npm install
 ```
 
-3. Start the signaling server:
+3. **Start the signaling server** (Terminal 1):
 ```bash
 node server.js
 ```
+You should see: `Server is listening on port 6503`
 
-4. In another terminal, start the game with a simple HTTP server:
+4. **Start the HTTP server** (Terminal 2):
 ```bash
 npx http-server -p 8080
 ```
 
-5. Open your browser to `http://localhost:8080`
+5. **Open in browser:**
+Navigate to `http://localhost:8080`
 
-### Alternative: Using Tea
+6. **Play the game:**
+- Choose "Play as Guest" or login
+- Navigate through menus to Quick Play
+- Select your character
+- Wait in matchmaking lobby
+- Click "Ready" when opponent joins
+- Fight!
+
+### For 2-Player Local Multiplayer
+- **Option A**: Open two browser tabs on same machine
+- **Option B**: Connect from another device on same network
+  - Find your IP: `ifconfig` (Mac/Linux) or `ipconfig` (Windows)
+  - Player 2 opens `http://<your-ip>:8080`
+
+### Alternative Servers
 
 Install tea: <br/>
 `sh <(curl tea.xyz)` <br/>
