@@ -291,9 +291,18 @@ export async function gameLoop() {
     players.forEach(function (player) {
         if (player.username != login.info[0]) {
             try {
-                player.sprite.x = peerState[player.username].x;
-                player.sprite.y = peerState[player.username].y;
-                player.sprite.setAnimation(peerState[player.username].animation);
+                const state = peerState[player.username];
+                player.sprite.x = state.x;
+                player.sprite.y = state.y;
+                player.sprite.setAnimation(state.animation);
+                
+                // Sync combat state
+                if (state.health !== undefined) player.health = state.health;
+                if (state.damagePercent !== undefined) player.damagePercent = state.damagePercent;
+                if (state.isAttacking !== undefined) player.isAttacking = state.isAttacking;
+                if (state.attackType !== undefined) player.attackType = state.attackType;
+                if (state.attackFrame !== undefined) player.attackFrame = state.attackFrame;
+                if (state.isOffStage !== undefined) player.isOffStage = state.isOffStage;
             } catch {
                 // console.log("peerState: ", peerState);
             }
@@ -308,7 +317,14 @@ export async function gameLoop() {
                 "x": player.sprite.x,
                 "y": player.sprite.y,
                 "animation": player.sprite.currentAnimation,
-                "playerCount": peerState.length + 1
+                "playerCount": peerState.length + 1,
+                // Combat state
+                "health": player.health,
+                "damagePercent": player.damagePercent,
+                "isAttacking": player.isAttacking,
+                "attackType": player.attackType,
+                "attackFrame": player.attackFrame,
+                "isOffStage": player.isOffStage
             }
             sendToServer(msg);
         }
