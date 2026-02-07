@@ -83,7 +83,8 @@ export class MatchmakingScreen extends BaseScene {
         this.container.addChild(this.countdownText);
 
         // Setup update loop
-        this.app.ticker.add(this.update, this);
+        this.updateFunc = this.update.bind(this);
+        this.app.ticker.add(this.updateFunc);
 
         // Setup input
         this.setupInputHandlers();
@@ -293,7 +294,9 @@ export class MatchmakingScreen extends BaseScene {
     }
 
     cleanup() {
-        this.app.ticker.remove(this.update, this);
+        if (this.updateFunc) {
+            this.app.ticker.remove(this.updateFunc);
+        }
         if (this.keyHandler) {
             document.removeEventListener('keydown', this.keyHandler);
         }

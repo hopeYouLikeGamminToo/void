@@ -100,16 +100,37 @@ export class CharacterSelectScreen extends BaseScene {
 
             // Try to add character preview sprite
             try {
-                // This will work if character assets are loaded
-                const preview = new Sprite();
-                preview.x = boxWidth / 2;
-                preview.y = boxHeight / 2 - 10;
-                preview.anchor.set(0.5);
-                preview.width = 120;
-                preview.height = 120;
-                box.addChild(preview);
-                box.preview = preview;
+                // Check if character assets are loaded
+                const resources = this.app.loader.resources;
+                
+                if (resources[charName] && resources[charName].textures) {
+                    // Get the first texture from the spritesheet
+                    const textures = resources[charName].textures;
+                    const textureKeys = Object.keys(textures);
+                    
+                    if (textureKeys.length > 0) {
+                        // Use first available texture as preview
+                        const preview = new Sprite(textures[textureKeys[0]]);
+                        preview.anchor.set(0.5);
+                        preview.x = boxWidth / 2;
+                        preview.y = boxHeight / 2 - 10;
+                        
+                        // Scale to fit the box nicely
+                        const scale = Math.min(100 / preview.width, 100 / preview.height);
+                        preview.scale.set(scale);
+                        
+                        box.addChild(preview);
+                        box.preview = preview;
+                        
+                        console.log(`[CharacterSelect] Loaded sprite for ${charName}`);
+                    } else {
+                        throw new Error('No textures found');
+                    }
+                } else {
+                    throw new Error('Character not loaded');
+                }
             } catch (e) {
+                console.warn(`[CharacterSelect] Could not load sprite for ${charName}:`, e.message);
                 // Fallback: just show the name prominently
                 const placeholder = new Text('?', {
                     fontFamily: 'Arial',

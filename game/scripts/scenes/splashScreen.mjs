@@ -57,7 +57,8 @@ export class SplashScreen extends BaseScene {
         this.loadingText = loadingText;
 
         // Add pulsing animation ticker
-        this.app.ticker.add(this.animate, this);
+        this.animateFunc = this.animate.bind(this);
+        this.app.ticker.add(this.animateFunc);
     }
 
     onShow(data) {
@@ -96,10 +97,17 @@ export class SplashScreen extends BaseScene {
         if (this.title) {
             this.title.alpha = 0;
         }
+        
+        // Remove ticker to prevent memory leaks
+        if (this.animateFunc) {
+            this.app.ticker.remove(this.animateFunc);
+        }
     }
 
     cleanup() {
-        this.app.ticker.remove(this.animate, this);
+        if (this.animateFunc) {
+            this.app.ticker.remove(this.animateFunc);
+        }
         super.cleanup();
     }
 }

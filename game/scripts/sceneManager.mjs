@@ -145,6 +145,10 @@ export class BaseScene {
     async show(data = {}) {
         if (!this.initialized) {
             await this.init();
+        } else {
+            // If already initialized, clear and reinitialize to prevent overlapping
+            this.clearContainer();
+            await this.init();
         }
         
         this.data = data;
@@ -162,6 +166,21 @@ export class BaseScene {
         this.isVisible = false;
         this.onHide();
         console.log(`[${this.constructor.name}] Hiding`);
+    }
+
+    /**
+     * Clear all children from container to prevent overlapping
+     */
+    clearContainer() {
+        if (this.container && this.container.children) {
+            while (this.container.children.length > 0) {
+                const child = this.container.children[0];
+                this.container.removeChild(child);
+                // Don't destroy - let cleanup() handle that
+            }
+        }
+        // Reset initialized flag so init() will run again
+        this.initialized = false;
     }
 
     /**
