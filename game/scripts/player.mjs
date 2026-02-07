@@ -1,5 +1,9 @@
+// Player class for void game
 import { AnimatedSprite, Container, Sprite, Texture } from './libs/pixi.mjs';
 import { engine, World, Bodies, Vector } from './physics.mjs';
+
+// Constants
+const DEFAULT_ATTACK_DURATION = 12;
 
 export class Player {
     constructor(app, stage, username, character) {
@@ -63,22 +67,96 @@ export class Player {
         this.stage = stage;
         // this._resources = resources;
 
-        // future parameters...
-        // this._characer = character;
-        // this._health = 100;
-        // this._position = position;
-        this.run_right = Vector.create(0.6, 0);
-        this.run_left = Vector.create(-0.6, 0);
-        this.jump = Vector.create(0, -1.2); // Vector.create(this.body.x, this.body.y + 100);
+        // Combat stats
+        this.maxHealth = 150;
+        this.health = 150;
+        this.damagePercent = 0; // Smash-style damage percentage
+        this.isOffStage = false;
+        
+        // Character-specific stats (will vary by character)
+        this.stats = this.getCharacterStats(character);
+        this.speed = this.stats.speed;
+        this.jumpPower = this.stats.jumpPower;
+        this.weight = this.stats.weight;
+        this.attackPower = this.stats.attackPower;
+        
+        // Movement vectors
+        this.run_right = Vector.create(this.speed * 0.6, 0);
+        this.run_left = Vector.create(-this.speed * 0.6, 0);
+        this.jump = Vector.create(0, -this.jumpPower * 1.2);
 
         this.movement = "";
-        // this.jumpDuration = 500; // ms
-
-        // this will be dependent on character, specials, wearables, armor, etc.
-        // this.melee_strength = 10;
-        // this.jump_height = 20;
+        
+        // Attack state
+        this.isAttacking = false;
+        this.attackType = null;
+        this.attackFrame = 0;
 
         this.stage.addChild(this.sprite);
+    }
+
+    // Get character-specific stats
+    getCharacterStats(character) {
+        const stats = {
+            'kraken': {
+                speed: 1.0,
+                jumpPower: 1.0,
+                weight: 105,    // Heavy, harder to knock back
+                attackPower: 1.2 // Strong attacks
+            },
+            'spaceman': {
+                speed: 1.15,    // Increased speed
+                jumpPower: 1.25, // Better jumps
+                weight: 85,      // Light, easier to knock back
+                attackPower: 0.95 // Weaker attacks
+            },
+            'glonky': {
+                speed: 0.95,    // Slower
+                jumpPower: 0.9,  // Lower jumps
+                weight: 115,     // Heaviest
+                attackPower: 1.35 // Strongest attacks
+            },
+            'void': {
+                speed: 1.25,    // Fastest
+                jumpPower: 1.15,
+                weight: 80,      // Lightest
+                attackPower: 0.9  // Weakest attacks
+            }
+        };
+        
+        return stats[character] || stats['kraken'];
+    }
+
+    // Start an attack
+    startAttack(attackType) {
+        if (this.isAttacking) return false;
+        
+        this.isAttacking = true;
+        this.attackType = attackType;
+        this.attackFrame = 0;
+        
+        return true;
+    }
+
+    // Update attack state
+    updateAttack() {
+        if (!this.isAttacking) return;
+        
+        this.attackFrame++;
+        
+        // End attack after duration (matching AttackHitboxes)
+        const attackDurations = {
+            'light': 12,
+            'heavy': 20,
+            'special': 25
+        };
+        
+        const duration = attackDurations[this.attackType] || DEFAULT_ATTACK_DURATION;
+        if (this.attackFrame >= duration) {
+            this.isAttacking = false;
+            this.attackType = null;
+            this.attackFrame = 0;
+        }
     }
 
     position(x, y) {

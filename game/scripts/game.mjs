@@ -6,6 +6,10 @@ import { app, splash, start, game, end, login, chatbox } from "./app.mjs"
 import { playerList, sendToServer, log } from "./client.mjs";
 import { Point, Sprite } from './libs/pixi.mjs';
 import { engine, World, Body, Vector } from './physics.mjs';
+import { CombatSystem, AttackHitboxes } from './combat.mjs';
+import { HUD } from './hud.mjs';
+import { GameStateManager } from './gameState.mjs';
+import { VFXManager } from './vfx.mjs';
 
 // pixijs runs @ 60 FPS
 let frame = 0;
@@ -20,6 +24,13 @@ let player;
 let map;
 export let players = [];
 var gravity = 7;
+
+// Combat system
+let combatSystem = new CombatSystem();
+let hud = null;
+let gameStateManager = null;
+let vfxManager = null;
+let gameEnded = false;
 
 
 export function splashLoop() {
@@ -58,6 +69,10 @@ export async function gameLoop() {
     if (frame == 0) {
         console.log("game stage");
         map = new Map(app, game, 0);
+        hud = new HUD(app, game);
+        gameStateManager = new GameStateManager(app, game);
+        vfxManager = new VFXManager(app, game);
+        hud.showStatus('Waiting for players...');
 
         if (playerList.length == 0) {
             frame -= 1;
@@ -80,9 +95,37 @@ export async function gameLoop() {
     } else if (playerList.length < activeList.length) {
         console.log("drop player");
     }
+    
+    // Show start message when 2 players are ready
+    if (players.length >= 2 && frame < 180 && gameStateManager.getState() !== 'ended') {
+        hud.showStatus('FIGHT!');
+        if (gameStateManager.getState() === 'waiting') {
+            gameStateManager.setState('playing');
+        }
+    } else if (frame == 180) {
+        hud.hideStatus();
+    }
+
+    // Update HUD
+    if (players.length >= 2 && hud) {
+        hud.updateHealth(players[0], players[1]);
+    }
+    
+    // Update VFX
+    if (vfxManager) {
+        vfxManager.update();
+    }
+
+    // Ensure self player exists before updating
+    if (self === undefined || !players[self]) {
+        return;
+    }
 
     players[self].sprite.position = players[self].body.position;
     players[self].sprite.rotation = players[self].body.angle;
+    
+    // Update attack state
+    players[self].updateAttack();
 
     switch (players[self].movement) {
         case "jumping":
@@ -171,40 +214,27 @@ export async function gameLoop() {
     // }
 
     if (input.type == "gamepad" && activeList.length > 0) {
-        // console.log("input.gamepad: ", input.gamepad);
-        // let pressed = input.gamepad.update();
-        // console.log("pressed: ", pressed);
-
-        // if (input.gamepad.axesStatus[0].x > 0.5) {
-        //     console.log("run right!");
-        //     // this.player.angle += 3;
-        //     // this.turret.angle += 3;
-        // }
-
-        // if (input.gamepad.turbo) {
-        //     if (input.gamepad.buttonPressed("A", "hold")) {
-        //         console.log("A held!")
-        //         // this.turbo_fire();
-        //     }
-        //     if (input.gamepad.buttonPressed("B")) {
-        //         console.log("B pressed!")
-        //         // this.managePause();
-        //     }
-        // }
-
-
         var gamepads = navigator.getGamepads();
+        if (!gamepads || !gamepads[0]) return; // No gamepad connected
+        
         if (gamepads[0].buttons.some((elem) => elem.pressed == 1) || gamepads[0].axes.some((elem) => elem >= 0.2) || gamepads[0].axes.some((elem) => elem <= -0.2)) {
             console.log(gamepads[0]);
         }
 
-        if (gamepads[0].buttons[7].value) {
-            if (players[self].sprite.animation != "Shoot") {
-                createBullet("gamepad");
+        // Attack buttons (X, Y, B for light, heavy, special)
+        if (gamepads[0].buttons[2].value) { // X button - light attack
+            if (players[self].startAttack('light')) {
+                players[self].sprite.setAnimation('Shoot');
             }
-            players[self].sprite.setAnimation('Shoot');
-
-        } else if (gamepads[0].buttons[3].value || gamepads[0].axes[1] < -0.40 || players[self].jumping) {
+        } else if (gamepads[0].buttons[3].value) { // Y button - heavy attack
+            if (players[self].startAttack('heavy')) {
+                players[self].sprite.setAnimation('Shoot');
+            }
+        } else if (gamepads[0].buttons[1].value) { // B button - special attack
+            if (players[self].startAttack('special')) {
+                players[self].sprite.setAnimation('Shoot');
+            }
+        } else if (gamepads[0].buttons[0].value || gamepads[0].axes[1] < -0.40 || players[self].jumping) { // A button - jump
             players[self].jumping = true;
             players[self].sprite.setAnimation('Jump');
             Body.applyForce(players[self].body, players[self].body.position, players[self].jump);
@@ -237,12 +267,78 @@ export async function gameLoop() {
         }
     }
 
+    // Combat checks - check for attacks hitting other players
+    if (players.length >= 2 && !gameEnded) {
+        players.forEach((attacker, i) => {
+            if (attacker.isAttacking) {
+                const hitbox = AttackHitboxes[attacker.attackType] || AttackHitboxes.light;
+                // Check if we're in the active hit window (frames 3 to duration-2)
+                const isInHitWindow = attacker.attackFrame > 3 && attacker.attackFrame < (hitbox.duration - 2);
+                
+                if (isInHitWindow) {
+                    // Check hit against other players
+                    players.forEach((defender, j) => {
+                        if (i !== j && !defender.isOffStage) {
+                            const hitbox = AttackHitboxes[attacker.attackType] || AttackHitboxes.light;
+                            if (combatSystem.checkHitboxCollision(attacker, defender, hitbox)) {
+                                const result = combatSystem.applyDamage(attacker, defender, attacker.attackType);
+                                console.log(`Hit! ${defender.username} took ${result.damage} damage. HP: ${result.remainingHealth}`);
+                                
+                                // Add visual effect
+                                if (vfxManager) {
+                                    vfxManager.createHitEffect(
+                                        defender.sprite.x + defender.sprite.width / 2,
+                                        defender.sprite.y + defender.sprite.height / 2,
+                                        attacker.attackType
+                                    );
+                                }
+                            }
+                        }
+                    });
+                }
+            }
+        });
+        
+        // Check off-stage
+        players.forEach(player => {
+            combatSystem.checkOffStage(player, app.screen.height);
+        });
+        
+        // Check win condition
+        const winResult = combatSystem.checkWinCondition(players);
+        if (winResult && hud && gameStateManager.getState() === 'playing') {
+            gameEnded = true;
+            gameStateManager.showWinScreen(winResult.winner);
+        }
+    }
+    
+    // Handle restart (R key)
+    if (gameStateManager && gameStateManager.getState() === 'ended') {
+        // Check for R key press - using a simple keydown listener
+        if (document.__restartKeyPressed) {
+            console.log("Restarting game...");
+            gameStateManager.resetGame(players);
+            gameEnded = false;
+            frame = 60; // Skip the initial countdown
+            delete document.__restartKeyPressed;
+        }
+    }
+
     players.forEach(function (player) {
         if (player.username != login.info[0]) {
             try {
-                player.sprite.x = peerState[player.username].x;
-                player.sprite.y = peerState[player.username].y;
-                player.sprite.setAnimation(peerState[player.username].animation);
+                const state = peerState[player.username];
+                player.sprite.x = state.x;
+                player.sprite.y = state.y;
+                player.sprite.setAnimation(state.animation);
+                
+                // Sync combat state
+                if (state.health !== undefined) player.health = state.health;
+                if (state.damagePercent !== undefined) player.damagePercent = state.damagePercent;
+                if (state.isAttacking !== undefined) player.isAttacking = state.isAttacking;
+                if (state.attackType !== undefined) player.attackType = state.attackType;
+                if (state.attackFrame !== undefined) player.attackFrame = state.attackFrame;
+                if (state.isOffStage !== undefined) player.isOffStage = state.isOffStage;
             } catch {
                 // console.log("peerState: ", peerState);
             }
@@ -257,7 +353,14 @@ export async function gameLoop() {
                 "x": player.sprite.x,
                 "y": player.sprite.y,
                 "animation": player.sprite.currentAnimation,
-                "playerCount": peerState.length + 1
+                "playerCount": peerState.length + 1,
+                // Combat state
+                "health": player.health,
+                "damagePercent": player.damagePercent,
+                "isAttacking": player.isAttacking,
+                "attackType": player.attackType,
+                "attackFrame": player.attackFrame,
+                "isOffStage": player.isOffStage
             }
             sendToServer(msg);
         }

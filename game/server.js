@@ -214,6 +214,12 @@ wsServer.on('request', function(request) {
   };
   connection.sendUTF(JSON.stringify(msg));
 
+  // Send initial userlist to the new connection after a brief delay
+  // to ensure they've set their username first
+  setTimeout(function() {
+    sendUserListToAll();
+  }, 100);
+
   // Set up a handler for the "message" event received over WebSocket. This
   // is a message sent by a client, and may be text to share with other
   // users, a private message (text or signaling) for one user, or a command
@@ -271,6 +277,13 @@ wsServer.on('request', function(request) {
           connect.username = msg.name;
           sendUserListToAll();
           sendToClients = false;  // We already sent the proper responses
+          break;
+        
+        // Ready state or other game-related messages that affect matchmaking
+        case "ready":
+        case "game":
+          // Send userlist update to ensure all clients see current players
+          sendUserListToAll();
           break;
       }
 

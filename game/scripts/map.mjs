@@ -36,29 +36,58 @@ export class Map {
         // should be able to find the matter body offsets dynamically...
         // matter js position is the center of the body
         // pixi position is the top left corner of the body
-        // still doesn't seem to be working correctly though...
+        // Calculate center positions properly
+        
+        const platform1CenterX = this.platform1.x + this.platform1.width / 2;
+        const platform1CenterY = this.platform1.y + this.platform1.height / 2;
+        
+        const platform2CenterX = this.platform2.x + this.platform2.width / 2;
+        const platform2CenterY = this.platform2.y + this.platform2.height / 2;
+        
+        const platform3CenterX = this.platform3.x + this.platform3.width / 2;
+        const platform3CenterY = this.platform3.y + this.platform3.height / 2;
 
-        this.platform1_body = Bodies.rectangle( this.platform1.x + 95, this.platform1.y - 70, this.platform1.width - 30, this.platform1.height, {
-            isStatic: true,  // no moving or rotatation
-            isSensor: false,  // enable collisions
-            // friction: 2,  // friction forces
-            // frictionStatic: 2,  // static friction
-            restitution: 0 // bounciness
-        });
-        this.platform2_body = Bodies.rectangle( this.platform2.x + 95, this.platform2.y - 70, this.platform2.width - 30, this.platform2.height, {
-            isStatic: true,  // no moving or rotatation
-            isSensor: false,  // enable collisions
-            // friction: 2,  // friction forces
-            // frictionStatic: 1,  // static friction
-            restitution: 0 // bounciness
-        });
-        this.platform3_body = Bodies.rectangle( this.platform3.x + 405, this.platform3.y - 70, this.platform3.width - 50, this.platform3.height, {
-            isStatic: true,  // no moving or rotatation
-            isSensor: false,  // enable collisions
-            // friction: 2,  // friction forces
-            // frictionStatic: 1,  // static friction
-            restitution: 0 // bounciness
-        });
+        this.platform1_body = Bodies.rectangle(
+            platform1CenterX,
+            platform1CenterY,
+            this.platform1.width,
+            this.platform1.height,
+            {
+                isStatic: true,  // no moving or rotation
+                isSensor: false,  // enable collisions
+                friction: 0.8,  // friction forces
+                frictionStatic: 1,  // static friction
+                restitution: 0 // bounciness
+            }
+        );
+        
+        this.platform2_body = Bodies.rectangle(
+            platform2CenterX,
+            platform2CenterY,
+            this.platform2.width,
+            this.platform2.height,
+            {
+                isStatic: true,
+                isSensor: false,
+                friction: 0.8,
+                frictionStatic: 1,
+                restitution: 0
+            }
+        );
+        
+        this.platform3_body = Bodies.rectangle(
+            platform3CenterX,
+            platform3CenterY,
+            this.platform3.width,
+            this.platform3.height,
+            {
+                isStatic: true,
+                isSensor: false,
+                friction: 0.8,
+                frictionStatic: 1,
+                restitution: 0
+            }
+        );
 
         console.log("platform2.position: ", this.platform2.position);
         console.log("platform2_body.position: ", this.platform2_body.position);

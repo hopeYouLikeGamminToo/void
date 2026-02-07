@@ -31,77 +31,139 @@ keystrokes.bindKey('Enter', {
 // let jumpTimeout = null;
 keystrokes.bindKey('w', {
     onPressed: () => {
-        players[self].movement = "jumping";
-        jumpTimeout = setTimeout(() => {
-            players[self].movement = "";
-        }, 400);
+        if (players && players[self]) {
+            players[self].movement = "jumping";
+            jumpTimeout = setTimeout(() => {
+                if (players && players[self]) players[self].movement = "";
+            }, 400);
+        }
     },
     onPressedWithRepeat: () => {
         console.log('w');
     },
     onReleased: () => {
         // clearTimeout(jumpTimeout);
-        players[self].movement = "";
+        if (players && players[self]) players[self].movement = "";
     },
 })
 
 keystrokes.bindKeyCombo('w+a', {
     onPressed: () => {
-        players[self].movement = "jumpingLeft";
+        if (players && players[self]) players[self].movement = "jumpingLeft";
     },
     onPressedWithRepeat: () => {
         console.log('w+a');
     },
     onReleased: () => {
-        players[self].movement = "";
+        if (players && players[self]) players[self].movement = "";
     },
 })
 
 keystrokes.bindKeyCombo('w+d', {
     onPressed: () => {
-        players[self].movement = "jumpingRight";
+        if (players && players[self]) players[self].movement = "jumpingRight";
     },
     onPressedWithRepeat: () => {
         console.log('w+d');
     },
     onReleased: () => {
-        players[self].movement = "";
+        if (players && players[self]) players[self].movement = "";
     },
 })
 
 keystrokes.bindKey('a', {
     onPressed: () => {
-        players[self].movement = "runningLeft";
+        if (players && players[self]) players[self].movement = "runningLeft";
     },
     onPressedWithRepeat: () => {
         console.log('a');
     },
     onReleased: () => {
-        players[self].movement = "";
+        if (players && players[self]) players[self].movement = "";
     },
 })
 
 keystrokes.bindKey('d', {
     onPressed: () => {
-        players[self].movement = "runningRight";
+        if (players && players[self]) players[self].movement = "runningRight";
     },
     onPressedWithRepeat: () => {
         console.log('d');
     },
     onReleased: () => {
-        players[self].movement = "";
+        if (players && players[self]) players[self].movement = "";
     },
 })
 
 keystrokes.bindKey('s', {
     onPressed: () => {
-        players[self].movement = "ducking";
+        if (players && players[self]) players[self].movement = "ducking";
     },
     onPressedWithRepeat: () => {
         console.log('s');
     },
     onReleased: () => {
-        players[self].movement = "";
+        if (players && players[self]) players[self].movement = "";
+    },
+})
+
+// Attack keys
+keystrokes.bindKey('j', {
+    onPressed: () => {
+        // Light attack
+        if (players && players[self] && players[self].startAttack('light')) {
+            players[self].sprite.setAnimation('Shoot'); // Using Shoot as attack animation for now
+        }
+    },
+    onPressedWithRepeat: () => {
+        console.log('j - light attack');
+    },
+    onReleased: () => {
+        // Attack continues for its duration
+    },
+})
+
+keystrokes.bindKey('k', {
+    onPressed: () => {
+        // Heavy attack
+        if (players && players[self] && players[self].startAttack('heavy')) {
+            players[self].sprite.setAnimation('Shoot');
+        }
+    },
+    onPressedWithRepeat: () => {
+        console.log('k - heavy attack');
+    },
+    onReleased: () => {
+        // Attack continues for its duration
+    },
+})
+
+keystrokes.bindKey('l', {
+    onPressed: () => {
+        // Special attack
+        if (players && players[self] && players[self].startAttack('special')) {
+            players[self].sprite.setAnimation('Shoot');
+        }
+    },
+    onPressedWithRepeat: () => {
+        console.log('l - special attack');
+    },
+    onReleased: () => {
+        // Attack continues for its duration
+    },
+})
+
+// Restart key
+keystrokes.bindKey('r', {
+    onPressed: () => {
+        // Signal restart to game loop
+        document.__restartKeyPressed = true;
+    },
+    onPressedWithRepeat: () => {
+        console.log('r - restart');
+    },
+    onReleased: () => {
+        // Nothing needed
     },
 })
 
