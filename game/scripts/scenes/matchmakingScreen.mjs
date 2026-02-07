@@ -279,13 +279,20 @@ export class MatchmakingScreen extends BaseScene {
             this.readyButton.text.text = 'READY';
         }
 
-        // Send initial join message
+        // Send initial join message to trigger userlist update
         const msg = {
-            type: 'username',
-            id: null, // Will be set by client
-            name: data.userInfo?.username || 'Player'
+            type: 'game',
+            username: data.userInfo?.username || 'Player',
+            ts: Date.now(),
+            character: data.character || 'kraken',
+            x: 0,
+            y: 0,
+            animation: null,
+            playerCount: 0
         };
         sendToServer(msg);
+        
+        console.log('[Matchmaking] Joined lobby, requesting player list');
     }
 
     onHide() {

@@ -5,7 +5,8 @@ import { Player } from './player.mjs';
 import { Map } from './map.mjs';
 import { Chatbox } from './chatbox.mjs';
 import { Login } from './login.mjs';
-import { splashLoop, gameLoop } from './game.mjs';
+// REMOVED: Legacy game loop imports no longer needed with SceneManager
+// import { splashLoop, gameLoop } from './game.mjs';
 import { connect, playerList } from "./client.mjs";
 import { Engine, World, Body, Bodies } from './physics.mjs';
 
