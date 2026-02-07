@@ -105,6 +105,52 @@ keystrokes.bindKey('s', {
     },
 })
 
+// Attack keys
+keystrokes.bindKey('j', {
+    onPressed: () => {
+        // Light attack
+        if (players[self].startAttack('light')) {
+            players[self].sprite.setAnimation('Shoot'); // Using Shoot as attack animation for now
+        }
+    },
+    onPressedWithRepeat: () => {
+        console.log('j - light attack');
+    },
+    onReleased: () => {
+        // Attack continues for its duration
+    },
+})
+
+keystrokes.bindKey('k', {
+    onPressed: () => {
+        // Heavy attack
+        if (players[self].startAttack('heavy')) {
+            players[self].sprite.setAnimation('Shoot');
+        }
+    },
+    onPressedWithRepeat: () => {
+        console.log('k - heavy attack');
+    },
+    onReleased: () => {
+        // Attack continues for its duration
+    },
+})
+
+keystrokes.bindKey('l', {
+    onPressed: () => {
+        // Special attack
+        if (players[self].startAttack('special')) {
+            players[self].sprite.setAnimation('Shoot');
+        }
+    },
+    onPressedWithRepeat: () => {
+        console.log('l - special attack');
+    },
+    onReleased: () => {
+        // Attack continues for its duration
+    },
+})
+
 
 // export let keyboard = [];
 

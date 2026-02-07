@@ -6,6 +6,8 @@ import { app, splash, start, game, end, login, chatbox } from "./app.mjs"
 import { playerList, sendToServer, log } from "./client.mjs";
 import { Point, Sprite } from './libs/pixi.mjs';
 import { engine, World, Body, Vector } from './physics.mjs';
+import { CombatSystem, AttackHitboxes } from './combat.mjs';
+import { HUD } from './hud.mjs';
 
 // pixijs runs @ 60 FPS
 let frame = 0;
@@ -20,6 +22,11 @@ let player;
 let map;
 export let players = [];
 var gravity = 7;
+
+// Combat system
+let combatSystem = new CombatSystem();
+let hud = null;
+let gameEnded = false;
 
 
 export function splashLoop() {
@@ -58,6 +65,8 @@ export async function gameLoop() {
     if (frame == 0) {
         console.log("game stage");
         map = new Map(app, game, 0);
+        hud = new HUD(app, game);
+        hud.showStatus('Waiting for players...');
 
         if (playerList.length == 0) {
             frame -= 1;
@@ -80,9 +89,24 @@ export async function gameLoop() {
     } else if (playerList.length < activeList.length) {
         console.log("drop player");
     }
+    
+    // Show start message when 2 players are ready
+    if (players.length >= 2 && frame < 180) {
+        hud.showStatus('FIGHT!');
+    } else if (frame == 180) {
+        hud.hideStatus();
+    }
+
+    // Update HUD
+    if (players.length >= 2 && hud) {
+        hud.updateHealth(players[0], players[1]);
+    }
 
     players[self].sprite.position = players[self].body.position;
     players[self].sprite.rotation = players[self].body.angle;
+    
+    // Update attack state
+    players[self].updateAttack();
 
     switch (players[self].movement) {
         case "jumping":
@@ -198,13 +222,20 @@ export async function gameLoop() {
             console.log(gamepads[0]);
         }
 
-        if (gamepads[0].buttons[7].value) {
-            if (players[self].sprite.animation != "Shoot") {
-                createBullet("gamepad");
+        // Attack buttons (X, Y, B for light, heavy, special)
+        if (gamepads[0].buttons[2].value) { // X button - light attack
+            if (players[self].startAttack('light')) {
+                players[self].sprite.setAnimation('Shoot');
             }
-            players[self].sprite.setAnimation('Shoot');
-
-        } else if (gamepads[0].buttons[3].value || gamepads[0].axes[1] < -0.40 || players[self].jumping) {
+        } else if (gamepads[0].buttons[3].value) { // Y button - heavy attack
+            if (players[self].startAttack('heavy')) {
+                players[self].sprite.setAnimation('Shoot');
+            }
+        } else if (gamepads[0].buttons[1].value) { // B button - special attack
+            if (players[self].startAttack('special')) {
+                players[self].sprite.setAnimation('Shoot');
+            }
+        } else if (gamepads[0].buttons[0].value || gamepads[0].axes[1] < -0.40 || players[self].jumping) { // A button - jump
             players[self].jumping = true;
             players[self].sprite.setAnimation('Jump');
             Body.applyForce(players[self].body, players[self].body.position, players[self].jump);
@@ -234,6 +265,41 @@ export async function gameLoop() {
             // console.log("duck!");
         } else {
             players[self].sprite.setAnimation('Idle');
+        }
+    }
+
+    // Combat checks - check for attacks hitting other players
+    if (players.length >= 2 && !gameEnded) {
+        players.forEach((attacker, i) => {
+            if (attacker.isAttacking && attacker.attackFrame > 3 && attacker.attackFrame < 12) {
+                // Check hit against other players
+                players.forEach((defender, j) => {
+                    if (i !== j && !defender.isOffStage) {
+                        const hitbox = AttackHitboxes[attacker.attackType] || AttackHitboxes.light;
+                        if (combatSystem.checkHitboxCollision(attacker, defender, hitbox)) {
+                            const result = combatSystem.applyDamage(attacker, defender, attacker.attackType);
+                            console.log(`Hit! ${defender.username} took ${result.damage} damage. HP: ${result.remainingHealth}`);
+                        }
+                    }
+                });
+            }
+        });
+        
+        // Check off-stage
+        players.forEach(player => {
+            combatSystem.checkOffStage(player, app.screen.height);
+        });
+        
+        // Check win condition
+        const winResult = combatSystem.checkWinCondition(players);
+        if (winResult && hud) {
+            gameEnded = true;
+            if (winResult.winner) {
+                hud.showStatus(`${winResult.winner.username} WINS!`);
+            } else {
+                hud.showStatus('DRAW!');
+            }
+            // TODO: Add restart functionality
         }
     }
 
