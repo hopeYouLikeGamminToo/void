@@ -35,12 +35,12 @@ export class CombatSystem {
     // Calculate damage based on attack type and character stats
     calculateDamage(attacker, attackType) {
         const baseDamage = {
-            'light': 5,
-            'heavy': 15,
-            'special': 20
+            'light': 8,     // Increased from 5
+            'heavy': 18,    // Increased from 15
+            'special': 25   // Increased from 20
         };
         
-        const damage = baseDamage[attackType] || 5;
+        const damage = baseDamage[attackType] || 8;
         const multiplier = attacker.attackPower || 1.0;
         
         return Math.floor(damage * multiplier);
@@ -64,16 +64,17 @@ export class CombatSystem {
         }
         
         // Knockback increases with damage percent (Smash Bros style)
-        const baseKnockback = damage * 0.1;
-        const percentMultiplier = 1 + (defender.damagePercent / 100);
+        // Adjusted for better feel
+        const baseKnockback = damage * 0.15; // Increased from 0.1
+        const percentMultiplier = 1 + (defender.damagePercent / 80); // Changed from 100
         const weightResistance = defender.weight ? (100 / defender.weight) : 1;
         
         const knockbackForce = baseKnockback * percentMultiplier * weightResistance;
         
-        // Apply the force
+        // Apply the force with more upward component
         const force = Vector.create(
             direction.x * knockbackForce,
-            direction.y * knockbackForce - 0.5 // Add upward component
+            direction.y * knockbackForce - 0.8 // Increased from 0.5 for more vertical launch
         );
         
         Body.applyForce(defender.body, defender.body.position, force);
@@ -145,27 +146,27 @@ export class CombatSystem {
 // Attack hitbox definitions for different moves
 export const AttackHitboxes = {
     light: {
-        width: 60,
-        height: 60,
-        offsetX: 40,
+        width: 80,      // Increased from 60
+        height: 80,     // Increased from 60
+        offsetX: 50,    // Increased from 40
         offsetY: 0,
-        duration: 15, // frames
-        damage: 5
+        duration: 12,   // Reduced from 15 for faster attacks
+        damage: 8
     },
     heavy: {
-        width: 80,
-        height: 80,
-        offsetX: 50,
+        width: 100,     // Increased from 80
+        height: 100,    // Increased from 80
+        offsetX: 60,    // Increased from 50
         offsetY: -10,
-        duration: 25,
-        damage: 15
+        duration: 20,   // Reduced from 25
+        damage: 18
     },
     special: {
-        width: 100,
-        height: 100,
-        offsetX: 60,
+        width: 120,     // Increased from 100
+        height: 120,    // Increased from 100
+        offsetX: 70,    // Increased from 60
         offsetY: -20,
-        duration: 30,
-        damage: 20
+        duration: 25,   // Reduced from 30
+        damage: 25
     }
 };

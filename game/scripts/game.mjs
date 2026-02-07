@@ -9,6 +9,7 @@ import { engine, World, Body, Vector } from './physics.mjs';
 import { CombatSystem, AttackHitboxes } from './combat.mjs';
 import { HUD } from './hud.mjs';
 import { GameStateManager } from './gameState.mjs';
+import { VFXManager } from './vfx.mjs';
 
 // pixijs runs @ 60 FPS
 let frame = 0;
@@ -28,6 +29,7 @@ var gravity = 7;
 let combatSystem = new CombatSystem();
 let hud = null;
 let gameStateManager = null;
+let vfxManager = null;
 let gameEnded = false;
 
 
@@ -69,6 +71,7 @@ export async function gameLoop() {
         map = new Map(app, game, 0);
         hud = new HUD(app, game);
         gameStateManager = new GameStateManager(app, game);
+        vfxManager = new VFXManager(app, game);
         hud.showStatus('Waiting for players...');
 
         if (playerList.length == 0) {
@@ -106,6 +109,11 @@ export async function gameLoop() {
     // Update HUD
     if (players.length >= 2 && hud) {
         hud.updateHealth(players[0], players[1]);
+    }
+    
+    // Update VFX
+    if (vfxManager) {
+        vfxManager.update();
     }
 
     // Ensure self player exists before updating
@@ -270,6 +278,15 @@ export async function gameLoop() {
                         if (combatSystem.checkHitboxCollision(attacker, defender, hitbox)) {
                             const result = combatSystem.applyDamage(attacker, defender, attacker.attackType);
                             console.log(`Hit! ${defender.username} took ${result.damage} damage. HP: ${result.remainingHealth}`);
+                            
+                            // Add visual effect
+                            if (vfxManager) {
+                                vfxManager.createHitEffect(
+                                    defender.sprite.x + defender.sprite.width / 2,
+                                    defender.sprite.y + defender.sprite.height / 2,
+                                    attacker.attackType
+                                );
+                            }
                         }
                     }
                 });

@@ -97,26 +97,26 @@ export class Player {
             'kraken': {
                 speed: 1.0,
                 jumpPower: 1.0,
-                weight: 100,
-                attackPower: 1.2
+                weight: 105,    // Heavy, harder to knock back
+                attackPower: 1.2 // Strong attacks
             },
             'spaceman': {
-                speed: 1.1,
-                jumpPower: 1.2,
-                weight: 90,
-                attackPower: 1.0
+                speed: 1.15,    // Increased speed
+                jumpPower: 1.25, // Better jumps
+                weight: 85,      // Light, easier to knock back
+                attackPower: 0.95 // Weaker attacks
             },
             'glonky': {
-                speed: 0.9,
-                jumpPower: 0.9,
-                weight: 110,
-                attackPower: 1.3
+                speed: 0.95,    // Slower
+                jumpPower: 0.9,  // Lower jumps
+                weight: 115,     // Heaviest
+                attackPower: 1.35 // Strongest attacks
             },
             'void': {
-                speed: 1.2,
-                jumpPower: 1.1,
-                weight: 85,
-                attackPower: 0.9
+                speed: 1.25,    // Fastest
+                jumpPower: 1.15,
+                weight: 80,      // Lightest
+                attackPower: 0.9  // Weakest attacks
             }
         };
         
@@ -140,14 +140,14 @@ export class Player {
         
         this.attackFrame++;
         
-        // End attack after duration
+        // End attack after duration (matching AttackHitboxes)
         const attackDurations = {
-            'light': 15,
-            'heavy': 25,
-            'special': 30
+            'light': 12,
+            'heavy': 20,
+            'special': 25
         };
         
-        if (this.attackFrame >= (attackDurations[this.attackType] || 15)) {
+        if (this.attackFrame >= (attackDurations[this.attackType] || 12)) {
             this.isAttacking = false;
             this.attackType = null;
             this.attackFrame = 0;
