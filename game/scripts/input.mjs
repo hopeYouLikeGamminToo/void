@@ -153,6 +153,20 @@ keystrokes.bindKey('l', {
     },
 })
 
+// Restart key
+keystrokes.bindKey('r', {
+    onPressed: () => {
+        // Signal restart to game loop
+        document.__restartKeyPressed = true;
+    },
+    onPressedWithRepeat: () => {
+        console.log('r - restart');
+    },
+    onReleased: () => {
+        // Nothing needed
+    },
+})
+
 
 // export let keyboard = [];
 

@@ -8,6 +8,7 @@ import { Point, Sprite } from './libs/pixi.mjs';
 import { engine, World, Body, Vector } from './physics.mjs';
 import { CombatSystem, AttackHitboxes } from './combat.mjs';
 import { HUD } from './hud.mjs';
+import { GameStateManager } from './gameState.mjs';
 
 // pixijs runs @ 60 FPS
 let frame = 0;
@@ -26,6 +27,7 @@ var gravity = 7;
 // Combat system
 let combatSystem = new CombatSystem();
 let hud = null;
+let gameStateManager = null;
 let gameEnded = false;
 
 
@@ -66,6 +68,7 @@ export async function gameLoop() {
         console.log("game stage");
         map = new Map(app, game, 0);
         hud = new HUD(app, game);
+        gameStateManager = new GameStateManager(app, game);
         hud.showStatus('Waiting for players...');
 
         if (playerList.length == 0) {
@@ -91,8 +94,11 @@ export async function gameLoop() {
     }
     
     // Show start message when 2 players are ready
-    if (players.length >= 2 && frame < 180) {
+    if (players.length >= 2 && frame < 180 && gameStateManager.getState() !== 'ended') {
         hud.showStatus('FIGHT!');
+        if (gameStateManager.getState() === 'waiting') {
+            gameStateManager.setState('playing');
+        }
     } else if (frame == 180) {
         hud.hideStatus();
     }
@@ -277,14 +283,21 @@ export async function gameLoop() {
         
         // Check win condition
         const winResult = combatSystem.checkWinCondition(players);
-        if (winResult && hud) {
+        if (winResult && hud && gameStateManager.getState() === 'playing') {
             gameEnded = true;
-            if (winResult.winner) {
-                hud.showStatus(`${winResult.winner.username} WINS!`);
-            } else {
-                hud.showStatus('DRAW!');
-            }
-            // TODO: Add restart functionality
+            gameStateManager.showWinScreen(winResult.winner);
+        }
+    }
+    
+    // Handle restart (R key)
+    if (gameStateManager && gameStateManager.getState() === 'ended') {
+        // Check for R key press - using a simple keydown listener
+        if (document.__restartKeyPressed) {
+            console.log("Restarting game...");
+            gameStateManager.resetGame(players);
+            gameEnded = false;
+            frame = 60; // Skip the initial countdown
+            delete document.__restartKeyPressed;
         }
     }
 
