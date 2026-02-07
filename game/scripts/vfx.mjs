@@ -49,12 +49,7 @@ export class VFXManager {
 
     // Create a damage number that floats up
     createDamageNumber(x, y, damage) {
-        const Text = this.app.loader.resources ? 
-            require('./libs/pixi.mjs').Text : 
-            window.PIXI.Text;
-        
-        // We'll skip text for now to avoid import issues
-        // Just create a simple circle effect instead
+        // Simple circle effect for damage indication
         const effect = new Graphics();
         effect.beginFill(0xff0000, 0.8);
         effect.drawCircle(0, 0, 5);

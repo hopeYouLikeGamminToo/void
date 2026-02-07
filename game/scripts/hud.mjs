@@ -124,6 +124,12 @@ export class HUD {
         this.container.addChild(this.statusText);
     }
 
+    getHealthColor(healthPercent) {
+        if (healthPercent < 0.25) return 0xff0000; // Red
+        if (healthPercent < 0.5) return 0xffaa00;  // Yellow
+        return 0x00ff00; // Green
+    }
+
     updateHealth(player1, player2) {
         if (!player1 || !player2) return;
         
@@ -133,11 +139,7 @@ export class HUD {
         const p1HealthPercent = Math.max(0, player1.health / player1.maxHealth);
         this.player1Health.clear();
         
-        // Color changes based on health (green -> yellow -> red)
-        let p1Color = 0x00ff00; // green
-        if (p1HealthPercent < 0.5) p1Color = 0xffaa00; // yellow
-        if (p1HealthPercent < 0.25) p1Color = 0xff0000; // red
-        
+        const p1Color = this.getHealthColor(p1HealthPercent);
         this.player1Health.beginFill(p1Color);
         this.player1Health.drawRoundedRect(0, 0, barWidth * p1HealthPercent, 30, 5);
         this.player1Health.endFill();
@@ -148,10 +150,7 @@ export class HUD {
         const p2HealthPercent = Math.max(0, player2.health / player2.maxHealth);
         this.player2Health.clear();
         
-        let p2Color = 0x00ff00;
-        if (p2HealthPercent < 0.5) p2Color = 0xffaa00;
-        if (p2HealthPercent < 0.25) p2Color = 0xff0000;
-        
+        const p2Color = this.getHealthColor(p2HealthPercent);
         this.player2Health.beginFill(p2Color);
         this.player2Health.drawRoundedRect(0, 0, barWidth * p2HealthPercent, 30, 5);
         this.player2Health.endFill();

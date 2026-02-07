@@ -1,5 +1,9 @@
+// Player class for void game
 import { AnimatedSprite, Container, Sprite, Texture } from './libs/pixi.mjs';
 import { engine, World, Bodies, Vector } from './physics.mjs';
+
+// Constants
+const DEFAULT_ATTACK_DURATION = 12;
 
 export class Player {
     constructor(app, stage, username, character) {
@@ -147,7 +151,8 @@ export class Player {
             'special': 25
         };
         
-        if (this.attackFrame >= (attackDurations[this.attackType] || 12)) {
+        const duration = attackDurations[this.attackType] || DEFAULT_ATTACK_DURATION;
+        if (this.attackFrame >= duration) {
             this.isAttacking = false;
             this.attackType = null;
             this.attackFrame = 0;

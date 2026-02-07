@@ -3,6 +3,9 @@
 
 import { Body, Vector } from './physics.mjs';
 
+// Constants
+const OFF_STAGE_BUFFER = 200; // Pixels below screen before knockout
+
 export class CombatSystem {
     constructor() {
         this.attacks = new Map(); // Track active attacks
@@ -98,11 +101,14 @@ export class CombatSystem {
 
     // Get bounding box for a physics body
     getBodyBounds(body) {
+        // Use explicit checks for circle radius
+        const isCircle = body.circleRadius !== undefined && body.circleRadius !== null;
+        
         return {
-            x: body.position.x - body.circleRadius || body.bounds.min.x,
-            y: body.position.y - body.circleRadius || body.bounds.min.y,
-            width: (body.circleRadius || (body.bounds.max.x - body.bounds.min.x)) * 2,
-            height: (body.circleRadius || (body.bounds.max.y - body.bounds.min.y)) * 2
+            x: isCircle ? body.position.x - body.circleRadius : body.bounds.min.x,
+            y: isCircle ? body.position.y - body.circleRadius : body.bounds.min.y,
+            width: isCircle ? body.circleRadius * 2 : (body.bounds.max.x - body.bounds.min.x),
+            height: isCircle ? body.circleRadius * 2 : (body.bounds.max.y - body.bounds.min.y)
         };
     }
 
@@ -133,7 +139,7 @@ export class CombatSystem {
     checkOffStage(player, screenHeight) {
         if (!player.body) return false;
         
-        const isOffStage = player.body.position.y > screenHeight + 200;
+        const isOffStage = player.body.position.y > screenHeight + OFF_STAGE_BUFFER;
         if (isOffStage) {
             player.isOffStage = true;
             player.health = 0; // Instant death

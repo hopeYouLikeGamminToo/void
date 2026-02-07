@@ -270,26 +270,32 @@ export async function gameLoop() {
     // Combat checks - check for attacks hitting other players
     if (players.length >= 2 && !gameEnded) {
         players.forEach((attacker, i) => {
-            if (attacker.isAttacking && attacker.attackFrame > 3 && attacker.attackFrame < 12) {
-                // Check hit against other players
-                players.forEach((defender, j) => {
-                    if (i !== j && !defender.isOffStage) {
-                        const hitbox = AttackHitboxes[attacker.attackType] || AttackHitboxes.light;
-                        if (combatSystem.checkHitboxCollision(attacker, defender, hitbox)) {
-                            const result = combatSystem.applyDamage(attacker, defender, attacker.attackType);
-                            console.log(`Hit! ${defender.username} took ${result.damage} damage. HP: ${result.remainingHealth}`);
-                            
-                            // Add visual effect
-                            if (vfxManager) {
-                                vfxManager.createHitEffect(
-                                    defender.sprite.x + defender.sprite.width / 2,
-                                    defender.sprite.y + defender.sprite.height / 2,
-                                    attacker.attackType
-                                );
+            if (attacker.isAttacking) {
+                const hitbox = AttackHitboxes[attacker.attackType] || AttackHitboxes.light;
+                // Check if we're in the active hit window (frames 3 to duration-2)
+                const isInHitWindow = attacker.attackFrame > 3 && attacker.attackFrame < (hitbox.duration - 2);
+                
+                if (isInHitWindow) {
+                    // Check hit against other players
+                    players.forEach((defender, j) => {
+                        if (i !== j && !defender.isOffStage) {
+                            const hitbox = AttackHitboxes[attacker.attackType] || AttackHitboxes.light;
+                            if (combatSystem.checkHitboxCollision(attacker, defender, hitbox)) {
+                                const result = combatSystem.applyDamage(attacker, defender, attacker.attackType);
+                                console.log(`Hit! ${defender.username} took ${result.damage} damage. HP: ${result.remainingHealth}`);
+                                
+                                // Add visual effect
+                                if (vfxManager) {
+                                    vfxManager.createHitEffect(
+                                        defender.sprite.x + defender.sprite.width / 2,
+                                        defender.sprite.y + defender.sprite.height / 2,
+                                        attacker.attackType
+                                    );
+                                }
                             }
                         }
-                    }
-                });
+                    });
+                }
             }
         });
         

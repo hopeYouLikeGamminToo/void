@@ -3,6 +3,10 @@
 
 import { Container, Graphics, Text } from './libs/pixi.mjs';
 
+// Constants
+const SPAWN_POSITION_X = 250;
+const SPAWN_POSITION_Y = 250;
+
 export class GameStateManager {
     constructor(app, stage) {
         this.app = app;
@@ -92,8 +96,8 @@ export class GameStateManager {
             
             // Reset position
             if (player.body) {
-                player.body.position.x = 250;
-                player.body.position.y = 250;
+                player.body.position.x = SPAWN_POSITION_X;
+                player.body.position.y = SPAWN_POSITION_Y;
                 player.body.velocity.x = 0;
                 player.body.velocity.y = 0;
                 player.body.angularVelocity = 0;

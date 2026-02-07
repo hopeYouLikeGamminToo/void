@@ -112,7 +112,6 @@ This is v1.0 - the first playable release focusing on core gameplay. Future upda
 
 - Position sync between Pixi sprites and Matter bodies may have minor offsets
 - Character animations limited (using placeholder "Shoot" animation for attacks)
-- No pause/restart functionality yet (refresh page to restart)
 - Limited to 2 players currently
 
 ## Contributing
